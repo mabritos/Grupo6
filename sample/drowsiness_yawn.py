@@ -65,6 +65,7 @@ COUNTER = 0
 YAWN_COUNTER = 0
 Blink_verification = False
 Blink_counter = 0
+t_end = 0 #Variable to manage the time of a yawn
 
 print("-> Loading the predictor and detector...")
 #detector = dlib.get_frontal_face_detector()
@@ -82,7 +83,6 @@ while True:
     frame = vs.read()
     frame = imutils.resize(frame, width=650)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
     #rects = detector(gray, 0)
     rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
 		minNeighbors=5, minSize=(30, 30),
@@ -128,14 +128,18 @@ while True:
                 Blink_counter += 1
                 print("Cantidad de pestaneos: ",Blink_counter)
         
-
-        if (distance > YAWN_THRESH):
+        if (distance > YAWN_THRESH and t_end == 0):
+                t_end = time.time() + 3
                 YAWN_COUNTER += 1
                 cv2.putText(frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ",YAWN_COUNTER)
-                time.sleep(3)
+                
+       
+        if(time.time() > t_end):
+            t_end = 0
 
+        #Comment on Screen
         cv2.putText(frame, "MVP facial rec",(430, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
         
