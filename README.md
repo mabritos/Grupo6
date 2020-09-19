@@ -16,6 +16,10 @@ Instalar dependencias leyendo el archivo requirements.txt
 ```
 python -m pip install -r requirements.txt
 ```
+Instalar librería dlib
+```
+conda install -c conda-forge dlib
+```
 ### Programa
 Ejecutar __init_ _.py:
 ```
