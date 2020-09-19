@@ -57,12 +57,14 @@ ap.add_argument("-w", "--webcam", type=int, default=0,
                 help="index of webcam on system")
 args = vars(ap.parse_args())
 
-EYE_AR_THRESH = 0.3
+EYE_AR_THRESH = 0.2
 EYE_AR_CONSEC_FRAMES = 30
 YAWN_THRESH = 20
 saying = False
 COUNTER = 0
 YAWN_COUNTER = 0
+Blink_verification = False
+Blink_counter = 0
 
 print("-> Loading the predictor and detector...")
 #detector = dlib.get_frontal_face_detector()
@@ -118,20 +120,25 @@ while True:
         else:
             COUNTER = 0
 
+        if ear < EYE_AR_THRESH:
+            Blink_verification = True  
+        else:
+            if Blink_verification == True:
+                Blink_verification = False
+                Blink_counter += 1
+                print("Cantidad de pestaneos: ",Blink_counter)
+        
+
         if (distance > YAWN_THRESH):
                 YAWN_COUNTER += 1
                 cv2.putText(frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ",YAWN_COUNTER)
-                #time.sleep(5)
-                t_end = time.time() + 3
-                while time.time() < t_end:
-                    #No hacer nada
-                    x=0
-        cv2.putText(frame, "YAWN_COUNTER: ",(430, 30),
+                time.sleep(3)
+
+        cv2.putText(frame, "MVP facial rec",(430, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-        cv2.putText(frame, "YAWN: {:.2f}".format(distance), (430, 60),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        
 
 
     cv2.imshow("Frame", frame)
