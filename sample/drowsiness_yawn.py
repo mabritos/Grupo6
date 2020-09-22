@@ -62,9 +62,9 @@ EYE_AR_CONSEC_FRAMES = 30
 YAWN_THRESH = 20
 saying = False
 COUNTER = 0
-YAWN_COUNTER = 0
-Blink_verification = False
-Blink_counter = 0
+yawn_counter = 0
+blink_verification = False
+blink_counter = 0
 t_end = 0 #Variable to manage the time of a yawn
 
 print("-> Loading the predictor and detector...")
@@ -121,19 +121,19 @@ while True:
             COUNTER = 0
 
         if ear < EYE_AR_THRESH:
-            Blink_verification = True  
+            blink_verification = True  
         else:
-            if Blink_verification == True:
-                Blink_verification = False
-                Blink_counter += 1
-                print("Cantidad de pestaneos: ",Blink_counter)
+            if blink_verification == True:
+                blink_verification = False
+                blink_counter += 1
+                print("Cantidad de pestaneos: ",blink_counter)
         
         if (distance > YAWN_THRESH and t_end == 0):
                 t_end = time.time() + 3
-                YAWN_COUNTER += 1
+                yawn_counter += 1
                 cv2.putText(frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                print("Cantidad de bostezos: ",YAWN_COUNTER)
+                print("Cantidad de bostezos: ",yawn_counter)
                 
        
         if(time.time() > t_end):
