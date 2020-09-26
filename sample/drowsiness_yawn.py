@@ -68,8 +68,8 @@ blink_counter = 0
 t_end = 0 #Variable to manage the time of a yawn
 
 print("-> Loading the predictor and detector...")
-#detector = dlib.get_frontal_face_detector()
-detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")    #Faster but less accurate
+detector = dlib.get_frontal_face_detector()
+# detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")    #Faster but less accurate
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
 
@@ -83,14 +83,14 @@ while True:
     frame = vs.read()
     frame = imutils.resize(frame, width=650)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    #rects = detector(gray, 0)
-    rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
-		minNeighbors=5, minSize=(30, 30),
-		flags=cv2.CASCADE_SCALE_IMAGE)
+    rects = detector(gray, 0)
+    #rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
+	#	minNeighbors=5, minSize=(30, 30),
+	#	flags=cv2.CASCADE_SCALE_IMAGE)
 
-    #for rect in rects:
-    for (x, y, w, h) in rects:
-        rect = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
+    for rect in rects:
+    #for (x, y, w, h) in rects:
+        #rect = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
         
         shape = predictor(gray, rect)
         shape = face_utils.shape_to_np(shape)
