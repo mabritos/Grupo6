@@ -1,4 +1,4 @@
-#python drowniness_yawn.py --webcam webcam_index
+#python drowsiness_yawn.py --webcam webcam_index
 
 from scipy.spatial import distance as dist
 from imutils.video import VideoStream
@@ -139,6 +139,7 @@ while True:
         if(time.time() > t_end):
             t_end = 0
 
+        
         #Comment on Screen
         cv2.putText(frame, "MVP facial rec",(430, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
