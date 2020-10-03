@@ -3,9 +3,8 @@
 from scipy.spatial import distance as dist
 from imutils.video import VideoStream
 from imutils import face_utils
-from gtts import gTTS 
-import os
 from threading import Thread
+from gtts import gTTS
 import numpy as np
 import argparse
 import imutils
@@ -81,7 +80,6 @@ vs = VideoStream(src=args["webcam"]).start()
 time.sleep(1.0)
 
 while True:
-
     frame = vs.read()
     frame = imutils.resize(frame, width=650)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -93,7 +91,6 @@ while True:
     for rect in rects:
     #for (x, y, w, h) in rects:
         #rect = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
-        
         shape = predictor(gray, rect)
         shape = face_utils.shape_to_np(shape)
 
@@ -131,6 +128,9 @@ while True:
                 print("Cantidad de pestaneos: ",blink_counter)
         
         if (distance > YAWN_THRESH and t_end == 0):
+                tts = gTTS(text='Usted acaba de bostezar, tiene  sueno?', lang='es')
+                tts.save("good.mp3")
+                os.system("mpg321 good.mp3")
                 t_end = time.time() + 3
                 yawn_counter += 1
                 cv2.putText(frame, "Yawn Alert", (10, 30),
