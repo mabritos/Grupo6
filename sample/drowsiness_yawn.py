@@ -110,6 +110,9 @@ while True:
         lip = shape[48:60]
         cv2.drawContours(frame, [lip], -1, (0, 255, 0), 1)
 
+        # ----control de pestaneos------
+
+        # se controla que el ojo este abierto sino se tira una alerta
         if ear < EYE_AR_THRESH:
             COUNTER += 1
 
@@ -119,7 +122,8 @@ while True:
 
         else:
             COUNTER = 0
-
+        # conteo de pestaneo
+        # con verificacion de que el ojo se cierra y abre antes de contar el pestaneo
         if ear < EYE_AR_THRESH:
             blink_verification = True  
         else:
@@ -127,6 +131,8 @@ while True:
                 blink_verification = False
                 blink_counter += 1
                 print("Cantidad de pestaneos: ",blink_counter)
+
+        # ccontrol de bostesos        
         
         if (distance > YAWN_THRESH and t_end == 0):
                 t_end = time.time() + 3
