@@ -1,7 +1,6 @@
 import cv2
 from face_detection import FaceDetection
 
-
 face_detection = FaceDetection()
 webcam = cv2.VideoCapture(0)
 
@@ -20,7 +19,7 @@ while True:
         face_detection.check_drowsiness()
 
     cv2.imshow("Frame", frame)
-    
+
     if cv2.waitKey(1) == 27:
         break
 
