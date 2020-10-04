@@ -6,6 +6,7 @@ import dlib
 import numpy as np
 import os
 import time
+from alarms import Alarms
 
 class FaceDetection(object):
     """Esta clase detecta un rostro y sus landmarks"""
@@ -133,6 +134,7 @@ class FaceDetection(object):
                 cv2.putText(self.frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ", self.yawn_counter)
+                Alarms.yawn_alert()
                 
        
         if(time.time() > self.t_end):
