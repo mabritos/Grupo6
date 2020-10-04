@@ -15,6 +15,9 @@ while True:
     # Mostrar en el frame los landmarks
     face_detection.draw_landmarks()
 
+    # Buscar sintomas de sueño
+    face_detection.check_drowsiness()
+
     cv2.imshow("Frame", frame)
     
     if cv2.waitKey(1) == 27:

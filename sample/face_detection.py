@@ -4,6 +4,8 @@ from scipy.spatial import distance as dist
 import cv2
 import dlib
 import numpy as np
+import os
+import time
 
 class FaceDetection(object):
     """Esta clase detecta un rostro y sus landmarks"""
@@ -51,7 +53,6 @@ class FaceDetection(object):
         self._analyze()
         
         
-
     
     def final_ear(self, shape):
         """ Setea los ojos y las orejas """
@@ -104,4 +105,37 @@ class FaceDetection(object):
             cv2.drawContours(self.frame, [lip], -1, (0, 255, 0), 1)
         except:
             print('cara perdida')
+
+    def check_drowsiness(self):
+        """Conteo de pestaneos, bostezos y detección de sueño"""
+    
+        if self.ear < self.EYE_AR_THRESH:
+            self.counter += 1
+
+            if self.counter >= self.EYE_AR_CONSEC_FRAMES:
+                cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+        else:
+            self.counter = 0
+
+        if self.ear < self.EYE_AR_THRESH:
+            self.blink_verification = True  
+        else:
+            if self.blink_verification == True:
+                self.blink_verification = False
+                self.blink_counter += 1
+                print("Cantidad de pestaneos: ",self.blink_counter)
+        
+        if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
+                self.t_end = time.time() + 3
+                self.yawn_counter += 1
+                cv2.putText(self.frame, "Yawn Alert", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                print("Cantidad de bostezos: ", self.yawn_counter)
+                
+       
+        if(time.time() > self.t_end):
+            self.t_end = 0
+    
         
