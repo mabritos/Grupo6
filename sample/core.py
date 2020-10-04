@@ -17,6 +17,7 @@ while True:
     # Buscar sintomas de sueño
     if face_detection.face_detected:
         face_detection.check_drowsiness()
+        face_detection.head_pose_estimation()
 
     cv2.imshow("Frame", frame)
 

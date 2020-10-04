@@ -6,6 +6,7 @@ import dlib
 import numpy as np
 import os
 import time
+import math
 from alarms import Alarms
 
 class FaceDetection(object):
@@ -24,6 +25,9 @@ class FaceDetection(object):
         self.blink_verification = False
         self.blink_counter = 0
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
+        self.accumulator_pitch = 0.0
+        self.accumulator_roll = 0.0
+        self.accumulator_yaw = 0.0
 
 
         #_face_detector detecta rostros
@@ -40,8 +44,8 @@ class FaceDetection(object):
         self.face_detected = True if faces else False
 
         if self.face_detected:
-            landmarks = self._predictor(frame, faces[0])
-            self.landmarks = face_utils.shape_to_np(landmarks)
+            self.raw_landmarks = self._predictor(frame, faces[0])
+            self.landmarks = face_utils.shape_to_np(self.raw_landmarks)
             self.final_ear(self.landmarks)
             self.lips_distance = self.lip_distance(self.landmarks)
         else:
@@ -139,3 +143,119 @@ class FaceDetection(object):
        
         if(time.time() > self.t_end):
             self.t_end = 0
+
+    def head_pose_estimation(self):
+
+        landmark_coords = np.zeros((self.raw_landmarks.num_parts, 2), dtype="int")
+
+        # 2D model points
+        image_points = np.float32([
+            (self.raw_landmarks.part(30).x, self.raw_landmarks.part(30).y),  # nose
+            (self.raw_landmarks.part(8).x, self.raw_landmarks.part(8).y),  # Chin
+            (self.raw_landmarks.part(36).x, self.raw_landmarks.part(36).y),  # Left eye left corner
+            (self.raw_landmarks.part(45).x, self.raw_landmarks.part(45).y),  # Right eye right corner
+            (self.raw_landmarks.part(48).x, self.raw_landmarks.part(48).y),  # Left Mouth corner
+            (self.raw_landmarks.part(54).x, self.raw_landmarks.part(54).y),  # Right mouth corner
+            (self.raw_landmarks.part(27).x, self.raw_landmarks.part(27).y)
+        ])
+
+        # print(image_points)
+
+        # 3D model points
+        model_points = np.float32([
+            (0.0, 0.0, 0.0),  # Nose tip
+            (0.0, -330.0, -65.0),  # Chin
+            (225.0, 170.0, -135.0),  # Left eye left corner
+            (-225.0, 170.0, -135.0),  # Right eye right corner
+            (150.0, -150.0, -125.0),  # Left Mouth corner
+            (-150.0, -150.0, -125.0),  # Right mouth corner
+            (0.0, 140.0, 0.0)
+        ])
+
+        frame = self.frame
+
+        # image properties. channels is not needed so _ is to drop the value
+        height, width, _ = frame.shape
+
+        # Camera internals double
+        focal_length = width
+        center = np.float32([width / 2, height / 2])
+        camera_matrix = np.float32([[focal_length, 0.0, center[0]],
+                                        [0.0, focal_length, center[1]],
+                                        [0.0, 0.0, 1.0]])
+        dist_coeffs = np.zeros((4, 1), dtype="float32") #Assuming no lens distortion
+
+        retval, rvec, tvec = cv2.solvePnP(model_points, image_points, camera_matrix, dist_coeffs)
+
+        nose_end_point3D = np.float32([[50, 0, 0],
+                                    [0, 50, 0],
+                                    [0, 0, 50]])
+
+        nose_end_point2D, jacobian = cv2.projectPoints(nose_end_point3D, rvec, tvec, camera_matrix, dist_coeffs)
+
+        rotCamerMatrix, _ = cv2.Rodrigues(rvec)
+
+        euler_angles = self.getEulerAngles(rotCamerMatrix)
+
+        # Filter angle
+        self.accumulator_pitch = (0.5 * euler_angles[0]) + (1.0 - 0.5) * self.accumulator_pitch
+        self.accumulator_yaw = (0.5 * euler_angles[1]) + (1.0 - 0.5) * self.accumulator_yaw
+        self.accumulator_roll = (0.5 * euler_angles[2]) + (1.0 - 0.5) * self.accumulator_roll
+
+        euler_angles[0] = self.accumulator_pitch
+        euler_angles[1] = self.accumulator_yaw
+        euler_angles[2] = self.accumulator_roll
+        
+        # TODO: Draw head angles
+        # renderHeadAngles(frame, rvec, tvec, camera_matrix)
+
+        # Draw used points for head pose estimation
+        # for point in image_points:
+        #     print(point[0])
+        #     cv2.circle(frame, (point[0], point[1]), 3, (255, 0, 255), -1)
+
+        # Draw face angles
+        pitch = "Pitch: {}".format(self.accumulator_pitch)
+        yaw = "Yaw: {}".format(self.accumulator_yaw)
+        roll = "Roll: {}".format(self.accumulator_roll)
+
+        cv2.putText(self.frame, pitch, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (0, 0, 255), 2)
+        cv2.putText(self.frame, yaw, (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (0, 255, 0), 2)
+        cv2.putText(self.frame, roll, (10, 70), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (255, 0, 0), 2)
+
+    def getEulerAngles(self, camera_rot_matrix):
+        rt = cv2.transpose(camera_rot_matrix)
+        shouldBeIdentity = np.matmul(rt, camera_rot_matrix)
+        identity_mat = np.eye(3,3, dtype="float32")
+
+        isSingularMatrix = cv2.norm(identity_mat, shouldBeIdentity) < 1e-6
+
+        euler_angles = np.float32([0.0, 0.0, 0.0])
+        if not isSingularMatrix:
+            return euler_angles
+
+        sy = math.sqrt(camera_rot_matrix[0,0] * camera_rot_matrix[0,0] +  camera_rot_matrix[1,0] * camera_rot_matrix[1,0]);
+
+        singular = sy < 1e-6
+
+        if not singular:
+            x = math.atan2(camera_rot_matrix[2,1] , camera_rot_matrix[2,2])
+            y = math.atan2(-camera_rot_matrix[2,0], sy)
+            z = math.atan2(camera_rot_matrix[1,0], camera_rot_matrix[0,0])
+        else:
+            x = math.atan2(-camera_rot_matrix[1,2], camera_rot_matrix[1,1])
+            y = math.atan2(-camera_rot_matrix[2,0], sy)
+            z = 0
+
+        x = x * 180.0 / math.pi
+        y = y * 180.0 / math.pi
+        z = z * 180.0 / math.pi
+
+        euler_angles[0] = -x
+        euler_angles[1] = y
+        euler_angles[2] = z
+
+        return euler_angles
