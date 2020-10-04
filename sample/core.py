@@ -16,10 +16,8 @@ while True:
     face_detection.draw_landmarks()
 
     # Buscar sintomas de sueño
-    face_detection.check_drowsiness()
-
-    if not face_detection.face_detected:
-        print("ALERTA: No se detecta ningún rostro")
+    if face_detection.face_detected:
+        face_detection.check_drowsiness()
 
     cv2.imshow("Frame", frame)
     

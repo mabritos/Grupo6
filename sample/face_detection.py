@@ -39,13 +39,13 @@ class FaceDetection(object):
         faces = self._face_detector(frame)
         self.face_detected = True if faces else False
 
-        try:
+        if self.face_detected:
             landmarks = self._predictor(frame, faces[0])
             self.landmarks = face_utils.shape_to_np(landmarks)
             self.final_ear(self.landmarks)
             self.lips_distance = self.lip_distance(self.landmarks)
-
-        except IndexError:
+        else:
+            print("ALERTA: No se detecta ningún rostro")
             self.left_eye = None
             self.right_eye = None
 
