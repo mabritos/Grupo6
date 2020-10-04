@@ -18,6 +18,9 @@ while True:
     # Buscar sintomas de sueño
     face_detection.check_drowsiness()
 
+    if not face_detection.face_detected:
+        print("ALERTA: No se detecta ningún rostro")
+
     cv2.imshow("Frame", frame)
     
     if cv2.waitKey(1) == 27:

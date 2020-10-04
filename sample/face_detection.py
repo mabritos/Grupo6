@@ -18,10 +18,12 @@ class FaceDetection(object):
         self.EYE_AR_THRESH = 0.2
         self.EYE_AR_CONSEC_FRAMES = 30
         self.YAWN_THRESH = 20
+        self.face_detected = False
         self.yawn_counter = 0
         self.blink_verification = False
         self.blink_counter = 0
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
+
 
         #_face_detector detecta rostros
         self._face_detector = dlib.get_frontal_face_detector()
@@ -34,6 +36,7 @@ class FaceDetection(object):
 
         frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         faces = self._face_detector(frame)
+        self.face_detected = True if faces else False
 
         try:
             landmarks = self._predictor(frame, faces[0])
@@ -95,16 +98,13 @@ class FaceDetection(object):
 
     def draw_landmarks(self):
         """Dibuja en el frame los landmarks"""
-
-        try:
+        if self.face_detected:
             left_eye_hull = cv2.convexHull(self.left_eye)
             right_eye_hull = cv2.convexHull(self.right_eye)
             cv2.drawContours(self.frame, [left_eye_hull], -1, (0, 255, 0), 1)
             cv2.drawContours(self.frame, [right_eye_hull], -1, (0, 255, 0), 1)
             lip = self.landmarks[48:60]
             cv2.drawContours(self.frame, [lip], -1, (0, 255, 0), 1)
-        except:
-            print('cara perdida')
 
     def check_drowsiness(self):
         """Conteo de pestaneos, bostezos y detección de sueño"""
@@ -137,5 +137,3 @@ class FaceDetection(object):
        
         if(time.time() > self.t_end):
             self.t_end = 0
-    
-        
