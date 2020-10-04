@@ -114,7 +114,7 @@ class FaceDetection(object):
             self.counter += 1
 
             if self.counter >= self.EYE_AR_CONSEC_FRAMES:
-                cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
+                cv2.putText(self.frame, "DROWSINESS ALERT!", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         else:
