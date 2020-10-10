@@ -24,6 +24,9 @@ class FaceDetection(object):
         self.blink_verification = False
         self.blink_counter = 0
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
+        self.blink_time_counter = 0
+        self.blink_time_alert_counter = 0
+        self.blink_time_alert_counter_a = []
 
 
         #_face_detector detecta rostros
@@ -109,6 +112,10 @@ class FaceDetection(object):
 
     def check_drowsiness(self):
         """Conteo de pestaneos, bostezos y detección de sueño"""
+
+       
+        self.blink_drowsiness_symptoms = 8
+        self.blink_time_alert = 3
     
         if self.ear < self.EYE_AR_THRESH:
             self.counter += 1
@@ -120,6 +127,8 @@ class FaceDetection(object):
         else:
             self.counter = 0
 
+        # conteo de pestaneos    
+
         if self.ear < self.EYE_AR_THRESH:
             self.blink_verification = True  
         else:
@@ -127,7 +136,42 @@ class FaceDetection(object):
                 self.blink_verification = False
                 self.blink_counter += 1
                 print("Cantidad de pestaneos: ",self.blink_counter)
-        
+                
+
+        # sube el contador cada ves que el pestaneo demora mas de lo normal
+        """
+        if self.ear < self.EYE_AR_THRESH:
+            self.blink_time_counter += 1 
+            print("conteo de ojos cerrados:", self.blink_time_counter)   
+            if self.blink_time_counter >= self.blink_drowsiness_symptoms:
+                self.blink_time_alert_counter += 1
+                print("se cerraron los ojos por mas de lo normal:",self.blink_time_alert_counter)
+                if self.blink_time_alert_counter == self.blink_time_alert  :
+                    print("usted presenta sintomas de sueno!!!")
+                    self.blink_time_alert_counter = 0
+                self.blink_time_counter = 0
+        else:
+            self.blink_time_counter = 0
+        """ 
+
+         # sube el contador cada ves que el pestaneo demora mas de lo normal
+        if self.ear < self.EYE_AR_THRESH:
+            self.blink_time_counter += 1 
+            print("conteo de ojos cerrados:", self.blink_time_counter)   
+            if self.blink_time_counter >= self.blink_drowsiness_symptoms:
+                self.blink_time_alert_counter_a.append(time.time())
+                print("se cerraron los ojos por mas de lo normal:",self.blink_time_alert_counter_a)
+                if len(self.blink_time_alert_counter_a) == self.blink_time_alert  :
+                    print("usted presenta sintomas de sueno!!!")
+                    self.blink_time_alert_counter_a = []
+                self.blink_time_counter = 0
+        else:
+            self.blink_time_counter = 0
+        if len(self.blink_time_alert_counter_a) > 0 :
+            if self.blink_time_alert_counter_a [0]  <= (time.time()-10) :
+                self.blink_time_alert_counter_a.pop(0)
+                print("elimine un elemento porque paso un min", self.blink_time_alert_counter_a)
+
         if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
                 self.t_end = time.time() + 3
                 self.yawn_counter += 1
@@ -135,7 +179,7 @@ class FaceDetection(object):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ", self.yawn_counter)
                 Alarms.yawn_alert()
-                
+               
        
         if(time.time() > self.t_end):
             self.t_end = 0
