@@ -26,6 +26,7 @@ while True:
     if face_detection.face_detected:
         face_detection.check_drowsiness()
         face_detection.head_pose_estimation()
+        face_detection.check_distraction()
 
     cv2.imshow("Frame", frame)
 

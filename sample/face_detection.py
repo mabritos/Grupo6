@@ -145,6 +145,7 @@ class FaceDetection(object):
             self.t_end = 0
 
     def head_pose_estimation(self):
+        """Obtener e imprimir en pantalla los angulos de euler de la cabeza"""
 
         landmark_coords = np.zeros((self.raw_landmarks.num_parts, 2), dtype="int")
 
@@ -224,6 +225,8 @@ class FaceDetection(object):
                     0.5, (0, 255, 0), 2)
 
     def get_euler_angles(self, camera_rot_matrix):
+        """Obtener los angulos de Euler de la cabeza"""
+
         rt = cv2.transpose(camera_rot_matrix)
         shouldBeIdentity = np.matmul(rt, camera_rot_matrix)
         identity_mat = np.eye(3,3, dtype="float32")
@@ -258,9 +261,34 @@ class FaceDetection(object):
         return euler_angles
     
     def initial_setup(self):
+        """Setup de los angulos iniciales de euler de la cabeza"""
+
         Alarms.text_to_speech("Bienvenido al asistente de conducción de UNASEV, Por favor póngase en una posición cómoda de manejo y espere 5 segundos")
         time.sleep(5)
         self.head_pose_estimation()
         self.initial_face_angle_vertical = self.face_angle_vertical
         self.initial_face_angle_horizontal = self.face_angle_horizontal
+        print( self.initial_face_angle_vertical)
         Alarms.text_to_speech("Proceso de configuración finalizado, que tenga un buen viaje")
+
+    def check_distraction(self):
+        """Se detecta una distraccion en caso de que se pase un umbral con respecto a los angulos de euler originales"""
+        
+        vertical_threshold = 10
+        horizontal_threshold = 25
+        vertical_lower_bound = self.initial_face_angle_vertical - vertical_threshold
+        #angulo = self.initial_face_angle_vertical + vertical_threshold
+        horizontal_lower_bound = self.initial_face_angle_horizontal - horizontal_threshold
+        horizontal_upper_bound = self.initial_face_angle_horizontal + horizontal_threshold
+        if self.face_angle_vertical < vertical_lower_bound:
+            print('ALERTA: Cota vertical inferior traspasada')
+        if self.face_angle_horizontal < horizontal_lower_bound:
+            print('ALERTA: Cota horizontal inferior traspasada')
+        if self.face_angle_horizontal > horizontal_upper_bound:
+            print('ALERTA: Cota horizontal superior traspasada')
+"""
+        print(self.initial_face_angle_vertical)
+
+        if not angulo > self.face_angle_vertical:
+            print(time.time(), " ALERTA: Umbral vertical")
+"""
