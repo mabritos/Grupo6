@@ -25,8 +25,8 @@ class FaceDetection(object):
         self.blink_verification = False
         self.blink_counter = 0
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
-        self.accumulator_pitch = 0.0
-        self.accumulator_roll = 0.0
+        self.face_angle_vertical = 0.0
+        self.face_angle_horizontal = 0.0
         self.accumulator_yaw = 0.0
 
 
@@ -195,16 +195,16 @@ class FaceDetection(object):
 
         rotCamerMatrix, _ = cv2.Rodrigues(rvec)
 
-        euler_angles = self.getEulerAngles(rotCamerMatrix)
+        euler_angles = self.get_euler_angles(rotCamerMatrix)
 
         # Filter angle
-        self.accumulator_pitch = (0.5 * euler_angles[0]) + (1.0 - 0.5) * self.accumulator_pitch
+        self.face_angle_vertical = (0.5 * euler_angles[0]) + (1.0 - 0.5) * self.face_angle_vertical
         self.accumulator_yaw = (0.5 * euler_angles[1]) + (1.0 - 0.5) * self.accumulator_yaw
-        self.accumulator_roll = (0.5 * euler_angles[2]) + (1.0 - 0.5) * self.accumulator_roll
+        self.face_angle_horizontal = (0.5 * euler_angles[2]) + (1.0 - 0.5) * self.face_angle_horizontal
 
-        euler_angles[0] = self.accumulator_pitch
+        euler_angles[0] = self.face_angle_vertical
         euler_angles[1] = self.accumulator_yaw
-        euler_angles[2] = self.accumulator_roll
+        euler_angles[2] = self.face_angle_horizontal
         
         # TODO: Draw head angles
         # renderHeadAngles(frame, rvec, tvec, camera_matrix)
@@ -215,18 +215,15 @@ class FaceDetection(object):
         #     cv2.circle(frame, (point[0], point[1]), 3, (255, 0, 255), -1)
 
         # Draw face angles
-        pitch = "Pitch: {}".format(self.accumulator_pitch)
-        yaw = "Yaw: {}".format(self.accumulator_yaw)
-        roll = "Roll: {}".format(self.accumulator_roll)
+        pitch = "Vertical: {}".format(self.face_angle_vertical)
+        yaw = "Horizontal: {}".format(self.accumulator_yaw)
 
         cv2.putText(self.frame, pitch, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, (0, 0, 255), 2)
         cv2.putText(self.frame, yaw, (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, (0, 255, 0), 2)
-        cv2.putText(self.frame, roll, (10, 70), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (255, 0, 0), 2)
 
-    def getEulerAngles(self, camera_rot_matrix):
+    def get_euler_angles(self, camera_rot_matrix):
         rt = cv2.transpose(camera_rot_matrix)
         shouldBeIdentity = np.matmul(rt, camera_rot_matrix)
         identity_mat = np.eye(3,3, dtype="float32")
