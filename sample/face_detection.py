@@ -256,3 +256,11 @@ class FaceDetection(object):
         euler_angles[2] = z
 
         return euler_angles
+    
+    def initial_setup(self):
+        Alarms.text_to_speech("Bienvenido al asistente de conducción de UNASEV, Por favor póngase en una posición cómoda de manejo y espere 5 segundos")
+        time.sleep(5)
+        self.head_pose_estimation()
+        self.initial_face_angle_vertical = self.face_angle_vertical
+        self.initial_face_angle_horizontal = self.face_angle_horizontal
+        Alarms.text_to_speech("Proceso de configuración finalizado, que tenga un buen viaje")
