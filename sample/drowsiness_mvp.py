@@ -114,7 +114,7 @@ while True:
 
         # ----control de pestaneos------
 
-        # se controla que el ojo este abierto sino se tira una alerta
+        # se controla que el ojo este abierto si esta cerrado por un tiempo x se tira una alerta
         if ear < EYE_AR_THRESH:
             COUNTER += 1
 
