@@ -4,7 +4,6 @@ from scipy.spatial import distance as dist
 from imutils.video import VideoStream
 from imutils import face_utils
 from threading import Thread
-from gtts import gTTS
 import numpy as np
 import argparse
 import imutils
@@ -67,9 +66,7 @@ yawn_counter = 0
 blink_verification = False
 blink_counter = 0
 t_end = 0 #Variable to manage the time of a yawn
-blink_time_counter = 0
-blink_drowsiness_symptoms = 30
-blink_time_alert = 3
+
 
 print("-> Loading the predictor and detector...")
 detector = dlib.get_frontal_face_detector()
@@ -83,6 +80,7 @@ vs = VideoStream(src=args["webcam"]).start()
 time.sleep(1.0)
 
 while True:
+
     frame = vs.read()
     frame = imutils.resize(frame, width=650)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -94,6 +92,7 @@ while True:
     for rect in rects:
     #for (x, y, w, h) in rects:
         #rect = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
+        
         shape = predictor(gray, rect)
         shape = face_utils.shape_to_np(shape)
 
@@ -114,7 +113,7 @@ while True:
 
         # ----control de pestaneos------
 
-        # se controla que el ojo este abierto sino se tira una alerta
+        # se controla que el ojo este abierto si esta cerrado por un tiempo x se tira una alerta
         if ear < EYE_AR_THRESH:
             COUNTER += 1
 
@@ -124,17 +123,6 @@ while True:
 
         else:
             COUNTER = 0
-        # monitoreo de tiempo de pestaneo, aca se controla cuanto tiempo dura el pestaneo y cuantas veces lo realiza en un tiempo determinado
-
-        if ear < EYE_AR_THRESH:
-            blink_time_counter += 1    
-            if blink_time_counter >= blink_drowsiness_symptoms:
-                blink_time_alert += 1
-                if blink_time_alert >= 3 :
-                    print("usted presenta sintomas de sueno!!!", blink_time_counter)
-                    blink_time_alert = 0
-                blink_time_counter = 0
-
         # conteo de pestaneo
         # con verificacion de que el ojo se cierra y abre antes de contar el pestaneo
         if ear < EYE_AR_THRESH:
@@ -145,13 +133,10 @@ while True:
                 blink_counter += 1
                 print("Cantidad de pestaneos: ",blink_counter)
 
-        # control de bostesos        
         
+
+        # -----control de bostesos-----        
         if (distance > YAWN_THRESH and t_end == 0):
-            #problemas de compatibilidad con windows, en mac y linux funciona con normalidad  
-              #  tts = gTTS(text='Usted acaba de bostezar, tiene  sueno?', lang='es')
-              #  tts.save("good.mp3")
-              #  os.system("mpg321 good.mp3")
                 t_end = time.time() + 3
                 yawn_counter += 1
                 cv2.putText(frame, "Yawn Alert", (10, 30),
