@@ -27,7 +27,8 @@ class FaceDetection(object):
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
         self.face_angle_vertical = 0.0
         self.face_angle_horizontal = 0.0
-        self.accumulator_yaw = 0.0
+        self.face_angle_horizontal = 0.0
+        self.alarm = Alarms()
 
 
         #_face_detector detecta rostros
@@ -49,7 +50,7 @@ class FaceDetection(object):
             self.final_ear(self.landmarks)
             self.lips_distance = self.lip_distance(self.landmarks)
         else:
-            print("ALERTA: No se detecta ningún rostro")
+            self.alarm.lost_face()
             self.left_eye = None
             self.right_eye = None
 
@@ -138,7 +139,7 @@ class FaceDetection(object):
                 cv2.putText(self.frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ", self.yawn_counter)
-                Alarms.yawn_alert()
+                self.alarm.yawn_alert()
                 
        
         if(time.time() > self.t_end):
@@ -160,7 +161,7 @@ class FaceDetection(object):
             (self.raw_landmarks.part(27).x, self.raw_landmarks.part(27).y)
         ])
 
-        # print(image_points)
+    
 
         # 3D model points
         model_points = np.float32([
@@ -200,12 +201,10 @@ class FaceDetection(object):
 
         # Filter angle
         self.face_angle_vertical = (0.5 * euler_angles[0]) + (1.0 - 0.5) * self.face_angle_vertical
-        self.accumulator_yaw = (0.5 * euler_angles[1]) + (1.0 - 0.5) * self.accumulator_yaw
-        self.face_angle_horizontal = (0.5 * euler_angles[2]) + (1.0 - 0.5) * self.face_angle_horizontal
+        self.face_angle_horizontal = (0.5 * euler_angles[1]) + (1.0 - 0.5) * self.face_angle_horizontal
 
         euler_angles[0] = self.face_angle_vertical
-        euler_angles[1] = self.accumulator_yaw
-        euler_angles[2] = self.face_angle_horizontal
+        euler_angles[1] = self.face_angle_horizontal
         
         # TODO: Draw head angles
         # renderHeadAngles(frame, rvec, tvec, camera_matrix)
@@ -217,7 +216,7 @@ class FaceDetection(object):
 
         # Draw face angles
         pitch = "Vertical: {}".format(self.face_angle_vertical)
-        yaw = "Horizontal: {}".format(self.accumulator_yaw)
+        yaw = "Horizontal: {}".format(self.face_angle_horizontal)
 
         cv2.putText(self.frame, pitch, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, (0, 0, 255), 2)
@@ -263,13 +262,14 @@ class FaceDetection(object):
     def initial_setup(self):
         """Setup de los angulos iniciales de euler de la cabeza"""
 
-        Alarms.text_to_speech("Bienvenido al asistente de conducción de UNASEV, Por favor póngase en una posición cómoda de manejo y espere 5 segundos")
+        self.alarm.text_to_speech("Bienvenido al asistente de conducción de UNASEV, Por favor póngase en una posición cómoda de manejo y espere 5 segundos")
         time.sleep(5)
         self.head_pose_estimation()
         self.initial_face_angle_vertical = self.face_angle_vertical
         self.initial_face_angle_horizontal = self.face_angle_horizontal
-        print( self.initial_face_angle_vertical)
-        Alarms.text_to_speech("Proceso de configuración finalizado, que tenga un buen viaje")
+        
+        print ('Angulo vertical: ',self.initial_face_angle_vertical, ' Angulo horizontal: ', self.initial_face_angle_horizontal)
+        self.alarm.text_to_speech("Proceso de configuración finalizado, que tenga un buen viaje")
 
     def check_distraction(self):
         """Se detecta una distraccion en caso de que se pase un umbral con respecto a los angulos de euler originales"""
@@ -281,14 +281,8 @@ class FaceDetection(object):
         horizontal_lower_bound = self.initial_face_angle_horizontal - horizontal_threshold
         horizontal_upper_bound = self.initial_face_angle_horizontal + horizontal_threshold
         if self.face_angle_vertical < vertical_lower_bound:
-            print('ALERTA: Cota vertical inferior traspasada')
+            self.alarm.lost_face()
         if self.face_angle_horizontal < horizontal_lower_bound:
-            print('ALERTA: Cota horizontal inferior traspasada')
+            self.alarm.lost_face()
         if self.face_angle_horizontal > horizontal_upper_bound:
-            print('ALERTA: Cota horizontal superior traspasada')
-"""
-        print(self.initial_face_angle_vertical)
-
-        if not angulo > self.face_angle_vertical:
-            print(time.time(), " ALERTA: Umbral vertical")
-"""
+            self.alarm.lost_face()
