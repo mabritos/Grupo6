@@ -17,7 +17,7 @@ class FaceDetection(object):
         self.frame = None
         self.counter = 0
         self.EYE_AR_THRESH = 0.2
-        self.EYE_AR_CONSEC_FRAMES = 30
+        self.EYE_AR_CONSEC_FRAMES = 3
         self.YAWN_THRESH = 20
         self.face_detected = False
         self.yawn_counter = 0
@@ -120,7 +120,7 @@ class FaceDetection(object):
         self.blink_drowsiness_symptoms = 8
        
     
-        if self.ear < self.EYE_AR_THRESH:
+        """if self.ear < self.EYE_AR_THRESH:
             self.counter += 1
 
             if self.counter >= self.EYE_AR_CONSEC_FRAMES:
@@ -128,7 +128,15 @@ class FaceDetection(object):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         else:
-            self.counter = 0
+            self.counter = 0"""
+
+        if self.ear < self.EYE_AR_THRESH:
+            if self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES :
+                cv2.putText(self.frame, "DROWSINESS ALERT!", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+        else:
+            self.counter = time.time()
 
         # conteo de pestaneos    
 
