@@ -18,13 +18,19 @@ class FaceDetection(object):
         self.frame = None
         self.counter = 0
         self.EYE_AR_THRESH = 0.2
-        self.EYE_AR_CONSEC_FRAMES = 30
+        self.EYE_AR_CONSEC_FRAMES = 3
         self.YAWN_THRESH = 20
         self.face_detected = False
         self.yawn_counter = 0
         self.blink_verification = False
         self.blink_counter = 0
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
+        self.BLINK_TIME_CLOSED = 1 # Tiempo en segundos para que se considere un parpadeo largo
+        self.BLINK_TIME_GAP = 60 # el tiempo por el cuazl quedan guardado los parpadeos largos en el array
+        self.BLINK_TIME_ALERT = 2 # cantidad de veces que se produscan pestaneos largos antes de que se dispare una alerta
+        self.blink_time_alert_counter_a = [] # se guardan los moentos en que se detectaron los parpadeos largos
+        self.blink_counter_verification = False #veriable que permite verificar el momento de trasiciondes de estado del ojo(de abierto a cerrado)
+        self.blink_eye_closed = 0 # momento en el que se detecto que el ojo se cerro
         self.face_angle_vertical = 0.0
         self.face_angle_horizontal = 0.0
         self.face_angle_horizontal = 0.0
@@ -114,8 +120,12 @@ class FaceDetection(object):
 
     def check_drowsiness(self):
         """Conteo de pestaneos, bostezos y detección de sueño"""
+
+       
+        self.blink_drowsiness_symptoms = 8
+       
     
-        if self.ear < self.EYE_AR_THRESH:
+        """if self.ear < self.EYE_AR_THRESH:
             self.counter += 1
 
             if self.counter >= self.EYE_AR_CONSEC_FRAMES:
@@ -123,7 +133,18 @@ class FaceDetection(object):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         else:
-            self.counter = 0
+            self.counter = 0"""
+
+        if self.ear < self.EYE_AR_THRESH:
+            if self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES :
+                print("cuidado usted se a dormido!!!!")
+                cv2.putText(self.frame, "DROWSINESS ALERT!", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+        else:
+            self.counter = time.time()
+
+        # conteo de pestaneos    
 
         if self.ear < self.EYE_AR_THRESH:
             self.blink_verification = True  
@@ -132,7 +153,33 @@ class FaceDetection(object):
                 self.blink_verification = False
                 self.blink_counter += 1
                 print("Cantidad de pestaneos: ",self.blink_counter)
+                
+
+        # control de pestaneos largos en un tiempo a definir
+        if self.ear < self.EYE_AR_THRESH:
+            if self.blink_counter_verification == True :
+                self.blink_counter_verification = False
+                self.blink_eye_closed = time.time() + self.BLINK_TIME_CLOSED
+            if time.time() >= self.blink_eye_closed and self.blink_eye_closed != 0  :
+                self.blink_time_alert_counter_a.append(time.time())
+                self.blink_eye_closed = 0
+                print("Se subio el contador de sintomas en 1", self.blink_time_alert_counter_a)
+                if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
+                    print("usted presenta sintomas de sueno!!!")
+                    self.blink_time_alert_counter_a = []
+        else:
+            self.blink_counter_verification = True
+            self.blink_eye_closed = 0
+
         
+        # solamente mantiene los pestaneos que se relaizaron en el intervalod de un minuto hacia atras, el resto los elimina    
+        if len(self.blink_time_alert_counter_a) > 0 :
+            if self.blink_time_alert_counter_a [0]  <= (time.time() - self.BLINK_TIME_GAP) :
+                self.blink_time_alert_counter_a.pop(0)
+                print("elimine un elemento porque paso un min", self.blink_time_alert_counter_a)
+
+
+        # bostezos
         if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
                 self.t_end = time.time() + 3
                 self.yawn_counter += 1
