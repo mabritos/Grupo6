@@ -24,9 +24,12 @@ class FaceDetection(object):
         self.blink_verification = False
         self.blink_counter = 0
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
-        self.blink_time_counter = 0
-        self.blink_time_alert_counter = 0
-        self.blink_time_alert_counter_a = []
+        self.BLINK_TIME_CLOSED = 1 # Tiempo en segundos para que se considere un parpadeo largo
+        self.BLINK_TIME_GAP = 60 # el tiempo por el cuazl quedan guardado los parpadeos largos en el array
+        self.BLINK_TIME_ALERT = 2 # cantidad de veces que se produscan pestaneos largos antes de que se dispare una alerta
+        self.blink_time_alert_counter_a = [] # se guardan los moentos en que se detectaron los parpadeos largos
+        self.blink_counter_verification = False #veriable que permite verificar el momento de trasiciondes de estado del ojo(de abierto a cerrado)
+        self.blink_eye_closed = 0 # momento en el que se detecto que el ojo se cerro
 
 
         #_face_detector detecta rostros
@@ -115,7 +118,7 @@ class FaceDetection(object):
 
        
         self.blink_drowsiness_symptoms = 8
-        self.blink_time_alert = 3
+       
     
         if self.ear < self.EYE_AR_THRESH:
             self.counter += 1
@@ -138,40 +141,31 @@ class FaceDetection(object):
                 print("Cantidad de pestaneos: ",self.blink_counter)
                 
 
-        # sube el contador cada ves que el pestaneo demora mas de lo normal
-        """
+        # control de pestaneos largos en un tiempo a definir
         if self.ear < self.EYE_AR_THRESH:
-            self.blink_time_counter += 1 
-            print("conteo de ojos cerrados:", self.blink_time_counter)   
-            if self.blink_time_counter >= self.blink_drowsiness_symptoms:
-                self.blink_time_alert_counter += 1
-                print("se cerraron los ojos por mas de lo normal:",self.blink_time_alert_counter)
-                if self.blink_time_alert_counter == self.blink_time_alert  :
-                    print("usted presenta sintomas de sueno!!!")
-                    self.blink_time_alert_counter = 0
-                self.blink_time_counter = 0
-        else:
-            self.blink_time_counter = 0
-        """ 
-
-         # sube el contador cada ves que el pestaneo demora mas de lo normal
-        if self.ear < self.EYE_AR_THRESH:
-            self.blink_time_counter += 1 
-            print("conteo de ojos cerrados:", self.blink_time_counter)   
-            if self.blink_time_counter >= self.blink_drowsiness_symptoms:
+            if self.blink_counter_verification == True :
+                self.blink_counter_verification = False
+                self.blink_eye_closed = time.time() + self.BLINK_TIME_CLOSED
+            if time.time() >= self.blink_eye_closed and self.blink_eye_closed != 0  :
                 self.blink_time_alert_counter_a.append(time.time())
-                print("se cerraron los ojos por mas de lo normal:",self.blink_time_alert_counter_a)
-                if len(self.blink_time_alert_counter_a) == self.blink_time_alert  :
+                self.blink_eye_closed = 0
+                print("Se subio el contador de sintomas en 1", self.blink_time_alert_counter_a)
+                if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     print("usted presenta sintomas de sueno!!!")
                     self.blink_time_alert_counter_a = []
-                self.blink_time_counter = 0
         else:
-            self.blink_time_counter = 0
+            self.blink_counter_verification = True
+            self.blink_eye_closed = 0
+
+        
+        # solamente mantiene los pestaneos que se relaizaron en el intervalod de un minuto hacia atras, el resto los elimina    
         if len(self.blink_time_alert_counter_a) > 0 :
-            if self.blink_time_alert_counter_a [0]  <= (time.time()-10) :
+            if self.blink_time_alert_counter_a [0]  <= (time.time() - self.BLINK_TIME_GAP) :
                 self.blink_time_alert_counter_a.pop(0)
                 print("elimine un elemento porque paso un min", self.blink_time_alert_counter_a)
 
+
+        # bostezos
         if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
                 self.t_end = time.time() + 3
                 self.yawn_counter += 1
