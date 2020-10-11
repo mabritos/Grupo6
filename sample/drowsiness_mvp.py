@@ -5,6 +5,8 @@ from imutils.video import VideoStream
 from imutils import face_utils
 from threading import Thread
 from gtts import gTTS
+import csv
+from datetime import datetime
 import numpy as np
 import argparse
 import imutils
@@ -67,7 +69,8 @@ yawn_counter = 0
 blink_verification = False
 blink_counter = 0
 t_end = 0 #Variable to manage the time of a yawn
-
+tts = gTTS(text='Usted acaba de bostezar, tiene  suenio?', lang='es')
+tts.save("good.mp3")
 print("-> Loading the predictor and detector...")
 detector = dlib.get_frontal_face_detector()
 # detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")    #Faster but less accurate
@@ -128,14 +131,15 @@ while True:
                 print("Cantidad de pestaneos: ",blink_counter)
         
         if (distance > YAWN_THRESH and t_end == 0):
-                tts = gTTS(text='Usted acaba de bostezar, tiene  sueno?', lang='es')
-                tts.save("good.mp3")
-                os.system("mpg321 good.mp3")
                 t_end = time.time() + 3
                 yawn_counter += 1
                 cv2.putText(frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ",yawn_counter)
+                os.system("mpg321 good.mp3")
+                with open('Datos.csv','a') as f:
+                    thewriter = csv.writer(f)
+                    thewriter.writerow([datetime.today().strftime('%Y-%m-%d'),'El conductor bostezo'])
                 
        
         if(time.time() > t_end):
