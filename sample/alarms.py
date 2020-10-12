@@ -22,9 +22,11 @@ class Alarms():
 
 
     def yawn_alert(self):
-        tts = gTTS(text='Usted acaba de bostezar, tiene  sueno?', lang='es')
+        tts = gTTS(text='Se han detectado sintomas de suenio', lang='es')
         tts.save("good.mp3")
         os.system("mpg321 good.mp3")
+
+    
 
     def text_to_speech(self, text):
         tts = gTTS(text=text, lang='es')

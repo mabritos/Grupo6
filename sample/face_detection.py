@@ -19,18 +19,23 @@ class FaceDetection(object):
         self.counter = 0
         self.EYE_AR_THRESH = 0.2
         self.EYE_AR_CONSEC_FRAMES = 3
-        self.YAWN_THRESH = 20
+        self.YAWN_THRESH = 40
         self.face_detected = False
         self.yawn_counter = 0
         self.blink_verification = False
         self.blink_counter = 0
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
+        self.t_end_blink=0 #Variable para controlar alarma cuando los ojos se cierran
         self.BLINK_TIME_CLOSED = 1 # Tiempo en segundos para que se considere un parpadeo largo
         self.BLINK_TIME_GAP = 60 # el tiempo por el cuazl quedan guardado los parpadeos largos en el array
         self.BLINK_TIME_ALERT = 2 # cantidad de veces que se produscan pestaneos largos antes de que se dispare una alerta
         self.blink_time_alert_counter_a = [] # se guardan los moentos en que se detectaron los parpadeos largos
         self.blink_counter_verification = False #veriable que permite verificar el momento de trasiciondes de estado del ojo(de abierto a cerrado)
         self.blink_eye_closed = 0 # momento en el que se detecto que el ojo se cerro
+        self.YAWN_TIME_GAP=60 #
+        self.YAWN_TIME_ALERT=2 # Cantidad de bostetzos por minuto para que se active la alarma
+        self.yawn_time_alert_counter_a= [] #se guardan los bostezos (se guarda en formato time)
+
         self.face_angle_vertical = 0.0
         self.face_angle_horizontal = 0.0
         self.face_angle_horizontal = 0.0
@@ -136,13 +141,16 @@ class FaceDetection(object):
             self.counter = 0"""
 
         if self.ear < self.EYE_AR_THRESH:
-            if self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES :
-                print("cuidado usted se a dormido!!!!")
-                cv2.putText(self.frame, "DROWSINESS ALERT!", (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
+                self.t_end_blink = time.time() + 5
+                self.alarm.text_to_speech("El conductor se esta durmiendo")
+                
 
         else:
             self.counter = time.time()
+
+        if(time.time() > self.t_end_blink):
+            self.t_end_blink= 0
 
         # conteo de pestaneos    
 
@@ -166,6 +174,8 @@ class FaceDetection(object):
                 print("Se subio el contador de sintomas en 1", self.blink_time_alert_counter_a)
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     print("usted presenta sintomas de sueno!!!")
+                    self.alarm.yawn_alert()
+                    #Agregar al csv con accion y tiempo
                     self.blink_time_alert_counter_a = []
         else:
             self.blink_counter_verification = True
@@ -181,16 +191,29 @@ class FaceDetection(object):
 
         # bostezos
         if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
-                self.t_end = time.time() + 3
+                self.yawn_time_alert_counter_a.append(time.time())
+                self.t_end = time.time() + 5
                 self.yawn_counter += 1
                 cv2.putText(self.frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ", self.yawn_counter)
+                if(self.yawn_counter == self.YAWN_TIME_ALERT):
+                     self.alarm.yawn_alert()
+                     self.yawn_counter = 0
+                
+               
+
+        if(time.time() > self.t_end):
+            self.t_end = 0
+        
+        # Borra los bostezos despues de un minuto   
+        if len(self.yawn_time_alert_counter_a) > 0 :
+            if self.yawn_time_alert_counter_a[0]  <= (time.time() - self.YAWN_TIME_GAP) :
+                self.yawn_time_alert_counter_a.pop(0)
+                self.yawn_counter=0
                 self.alarm.yawn_alert()
                 
        
-        if(time.time() > self.t_end):
-            self.t_end = 0
 
     def head_pose_estimation(self):
         """Obtener e imprimir en pantalla los angulos de euler de la cabeza"""

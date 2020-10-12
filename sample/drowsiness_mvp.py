@@ -5,6 +5,8 @@ from imutils.video import VideoStream
 from imutils import face_utils
 from threading import Thread
 from gtts import gTTS
+import csv
+from datetime import datetime
 import numpy as np
 import argparse
 import imutils
@@ -157,6 +159,10 @@ while True:
                 cv2.putText(frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 print("Cantidad de bostezos: ",yawn_counter)
+                os.system("mpg321 good.mp3")
+                with open('Datos.csv','a') as f:
+                    thewriter = csv.writer(f)
+                    thewriter.writerow([datetime.today().strftime('%Y-%m-%d'),'El conductor bostezo'])
                 
        
         if(time.time() > t_end):
