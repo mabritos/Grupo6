@@ -143,7 +143,7 @@ class FaceDetection(object):
         if self.ear < self.EYE_AR_THRESH:
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
-                self.alarm.yawn_alert()
+                self.alarm.text_to_speech("El conductor se esta durmiendo")
                 
 
         else:

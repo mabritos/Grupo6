@@ -26,6 +26,8 @@ class Alarms():
         tts.save("good.mp3")
         os.system("mpg321 good.mp3")
 
+    
+
     def text_to_speech(self, text):
         tts = gTTS(text=text, lang='es')
         tts.save("good.mp3")
