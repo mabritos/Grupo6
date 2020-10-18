@@ -6,8 +6,11 @@ face_detection = FaceDetection()
 
 webcam = cv2.VideoCapture(0)
 
+
 while face_detection.face_detected == False:
     _, frame = webcam.read()
+    
+    frame = cv2.resize(frame, (426,240))
 
     face_detection.refresh(frame)
 
@@ -16,7 +19,9 @@ face_detection.initial_setup()
 while True:
     # Obtenemos un nuevo frame
     _, frame = webcam.read()
-
+    
+    frame = cv2.resize(frame, (426,240))
+    
     # Mandamos el frame a FaceDetection para analizarlo
     face_detection.refresh(frame)
 
