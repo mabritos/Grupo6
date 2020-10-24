@@ -1,8 +1,10 @@
 import cv2
+from api import Api
 from face_detection import FaceDetection
 
 
 face_detection = FaceDetection()
+api = Api()
 
 webcam = cv2.VideoCapture(0)
 
@@ -35,6 +37,8 @@ while True:
         face_detection.check_distraction()
 
     cv2.imshow("Frame", frame)
+
+    api.send_csv()
 
     if cv2.waitKey(1) == 27:
         break

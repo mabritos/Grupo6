@@ -76,7 +76,7 @@ class FaceDetection(object):
             image = image_aux[2:]
         with open('Datos.csv','a') as f:
             thewriter = csv.writer(f)
-            thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d'),event,image,location,speed])
+            thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d %H:%M:%S'),event,image,location,speed])
 
     def refresh(self, frame):
         """Refresca el frame y lo analiza."""
