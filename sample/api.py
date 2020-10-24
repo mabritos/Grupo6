@@ -17,4 +17,4 @@ class Api:
             data = {"csv": csv}
             url = "https://fer.demos.oxusmedia.com/ticv/api/sendCSV"
             response = requests.post(url, data)
-            print(response.text)
+            # print(response.text)

@@ -42,3 +42,6 @@ pydevd*.log
 nodeLanguageServer/**
 nodeLanguageServer.*/**
 .vscode/
+sample/frame.jpg
+sample/good.mp3
+sample/Datos.csv
