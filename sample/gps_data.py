@@ -11,13 +11,14 @@ class GpsData(object):
         self.speed = agps_thread.data_stream.speed
         self.course = agps_thread.data_stream.track
 
-    @property
     def get_speed(self):
         self.speed = agps_thread.data_stream.speed
         return self.speed
-
-    @property
-    def get_coord(self):
-        self.lon = agps_thread.data_stream.lon
+    
+    def get_lat(self):
         self.lat = agps_thread.data_stream.lat
-        return {"lat": self.lat, "lon": self.lon}
+        return self.lat
+    
+    def get_lon(self):
+        self.lon = agps_thread.data_stream.lon
+        return self.lon

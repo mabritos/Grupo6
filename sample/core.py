@@ -4,9 +4,11 @@ from face_detection import FaceDetection
 from gps_data import GpsData
 
 
-face_detection = FaceDetection()
-api = Api()
 gps = GpsData()
+face_detection = FaceDetection()
+face_detection.set_gps(gps)
+api = Api()
+
 
 webcam = cv2.VideoCapture(0)
 
@@ -14,33 +16,33 @@ webcam = cv2.VideoCapture(0)
 while face_detection.face_detected == False:
     _, frame = webcam.read()
     
-    frame = cv2.resize(frame, (426,240))
+    frame = cv2.resize(frame, (511,288))
 
     face_detection.refresh(frame)
 
 face_detection.initial_setup()
 
 while True:
-    
-    print(GpsData.get_speed())
+    print(gps.get_speed())
+    if (gps.get_speed() > 0):
     # Obtenemos un nuevo frame
-    _, frame = webcam.read()
+        _, frame = webcam.read()
     
-    frame = cv2.resize(frame, (426,240))
+        frame = cv2.resize(frame, (511,288))
     
     # Mandamos el frame a FaceDetection para analizarlo
-    face_detection.refresh(frame)
+        face_detection.refresh(frame)
 
     # Mostrar en el frame los landmarks
-    face_detection.draw_landmarks()
+        face_detection.draw_landmarks()
 
     # Buscar sintomas de sueño
-    if face_detection.face_detected:
-        face_detection.check_drowsiness()
-        face_detection.head_pose_estimation()
-        face_detection.check_distraction()
+        if face_detection.face_detected:
+            face_detection.check_drowsiness()
+            face_detection.head_pose_estimation()
+            face_detection.check_distraction()
 
-    cv2.imshow("Frame", frame)
+        cv2.imshow("Frame", frame)
 
     api.send_csv()
 

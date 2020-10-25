@@ -55,6 +55,9 @@ class FaceDetection(object):
 
         #_predictor es usado para obtener los landmarks de una cara
         self._predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+        
+    def set_gps(self, gps):
+        self.gps = gps
 
     def _analyze(self):
         """Detecta un rostro y todos sus landmarks"""
@@ -80,7 +83,8 @@ class FaceDetection(object):
             image = image_aux[2:]
         with open('Datos.csv','a') as f:
             thewriter = csv.writer(f)
-            thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d %H:%M:%S'),event,image,location,speed])
+            location = ''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())
+            thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d %H:%M:%S'),event,image,location,self.gps.get_speed()])
 
     def refresh(self, frame):
         """Refresca el frame y lo analiza."""
