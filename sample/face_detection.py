@@ -11,6 +11,7 @@ import csv
 import base64
 from alarms import Alarms
 from datetime import datetime
+from csv_handler import CsvHandler
 
 class FaceDetection(object):
     """Esta clase detecta un rostro y sus landmarks"""
@@ -77,16 +78,7 @@ class FaceDetection(object):
             self.left_eye = None
             self.right_eye = None
 
-    def csv_input(self,car_id,event,location,speed):
-        cv2.imwrite("frame.jpg", self.frame)
-        with open("frame.jpg", "rb") as imageFile:
-            image_aux = base64.b64encode(imageFile.read())
-            image = image_aux[2:]
-        with open('Datos.csv','a') as f:
-            thewriter = csv.writer(f)
-            location = ''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())
-            thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d %H:%M:%S'),event,image,location,self.gps.get_speed()])
-
+    
     def refresh(self, frame):
         """Refresca el frame y lo analiza."""
 
@@ -163,7 +155,7 @@ class FaceDetection(object):
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
                 self.alarm.text_to_speech("El conductor se esta durmiendo")
-                self.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,'Not found','35')
+                CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,'Not found','35')
                 
                 
 
@@ -196,7 +188,7 @@ class FaceDetection(object):
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     self.blink_time_alert_counter_a = []
                     self.alarm.text_to_speech("usted presenta sintomas de sueno")
-                    self.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,'Not found','60')
+                    CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,'Not found','60')
                     #self.alarm.yawn_alert()
         else:
             self.blink_counter_verification = True
