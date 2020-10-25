@@ -20,14 +20,14 @@ class FaceDetection(object):
         
         self.frame = None
         self.counter = 0
-        self.EYE_AR_THRESH = 0.2
+        self.EYE_AR_THRESH = 0.15
         self.EYE_AR_CONSEC_FRAMES = 3
-        self.YAWN_THRESH = 40
+        self.YAWN_THRESH = 25
         self.face_detected = False
         self.yawn_counter = 0
+
         self.blink_verification = False
         self.blink_counter = 0
-        self.t_end = 0 #Variable para controlar el tiempo de un bostezo
         self.t_end_blink=0 #Variable para controlar alarma cuando los ojos se cierran
         self.BLINK_TIME_CLOSED = 1 # Tiempo en segundos para que se considere un parpadeo largo
         self.BLINK_TIME_GAP = 60 # el tiempo por el cuazl quedan guardado los parpadeos largos en el array
@@ -35,8 +35,12 @@ class FaceDetection(object):
         self.blink_time_alert_counter_a = [] # se guardan los moentos en que se detectaron los parpadeos largos
         self.blink_counter_verification = False #veriable que permite verificar el momento de trasiciondes de estado del ojo(de abierto a cerrado)
         self.blink_eye_closed = 0 # momento en el que se detecto que el ojo se cerro
+
+        self.yawn_closed = 0
+        self.yawn_counter_verification = False
+        self.t_end = 0 #Variable para controlar el tiempo de un bostezo
         self.YAWN_TIME_GAP=60 #
-        self.YAWN_TIME_ALERT=2 # Cantidad de bostetzos por minuto para que se active la alarma
+        self.YAWN_TIME_ALERT=3 # Cantidad de bostetzos por minuto para que se active la alarma
         self.yawn_time_alert_counter_a= [] #se guardan los bostezos (se guarda en formato time)
         self.EVENT_STRING_DROWSINESS= 'El conductor presenta síntomas de sueño'
         self.EVENT_STRING_SLEEP= 'El conductor se esta durmiendo'
@@ -183,8 +187,9 @@ class FaceDetection(object):
             if time.time() >= self.blink_eye_closed and self.blink_eye_closed != 0  :
                 self.blink_time_alert_counter_a.append(time.time())
                 self.blink_eye_closed = 0
-                print("Se subio el contador de sintomas en 1", self.blink_time_alert_counter_a)
+                print("Se subio el contador de sintomas (pestaneos) en 1", self.blink_time_alert_counter_a)
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
+                    self.blink_time_alert_counter_a = []
                     self.alarm.text_to_speech("usted presenta sintomas de sueno")
                     self.csv_input('SAF 6245',self.EVENT_STRING_DROWSINESS,'Not found','60')
                     #self.alarm.yawn_alert()
@@ -193,21 +198,43 @@ class FaceDetection(object):
             self.blink_eye_closed = 0
 
         
-        # solamente mantiene los pestaneos que se relaizaron en el intervalod de un minuto hacia atras, el resto los elimina    
+        # solamente mantiene los pestaneos que se relaizaron en el intervalo de un minuto hacia atras, el resto los elimina    
         if len(self.blink_time_alert_counter_a) > 0 :
             if self.blink_time_alert_counter_a [0]  <= (time.time() - self.BLINK_TIME_GAP) :
                 self.blink_time_alert_counter_a.pop(0)
-                print("elimine un elemento porque paso un min", self.blink_time_alert_counter_a)
+                print("elimine un elemento (pestaneo) porque paso un min", self.blink_time_alert_counter_a)
+        
+        
 
 
         # bostezos
-        if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
+
+        if self.lips_distance > self.YAWN_THRESH:
+            if self.yawn_counter_verification == True :
+                self.yawn_counter_verification = False
+                self.yawn_time_alert_counter_a.append(time.time())
+                print("se a incrementado en 1 bostezos", self.yawn_time_alert_counter_a)
+                if len(self.yawn_time_alert_counter_a) == self.YAWN_TIME_ALERT:
+                    self.alarm.yawn_alert()
+                    self.yawn_time_alert_counter_a = []
+        else:
+            self.yawn_counter_verification = True 
+
+        if len(self.yawn_time_alert_counter_a) > 0:
+            if self.yawn_time_alert_counter_a [0] <= (time.time() - self.YAWN_TIME_GAP):
+                self.yawn_time_alert_counter_a.pop(0)
+                print("se elimino un lemento (Bostezo) porque paso un min",self.yawn_time_alert_counter_a)
+
+
+
+
+        #codigo de bsotezo de referencia
+        """if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
                 self.yawn_time_alert_counter_a.append(time.time())
                 self.t_end = time.time() + 5
                 self.yawn_counter += 1
                 cv2.putText(self.frame, "Yawn Alert", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                print("Cantidad de bostezos: ", self.yawn_counter)
                 if(self.yawn_counter == self.YAWN_TIME_ALERT):
                      self.alarm.yawn_alert()
                      self.yawn_counter = 0
@@ -221,8 +248,11 @@ class FaceDetection(object):
         if len(self.yawn_time_alert_counter_a) > 0 :
             if self.yawn_time_alert_counter_a[0]  <= (time.time() - self.YAWN_TIME_GAP) :
                 self.yawn_time_alert_counter_a.pop(0)
+                # verificar que este bien 
                 self.yawn_counter=0
-                self.alarm.yawn_alert()
+                self.alarm.yawn_alert()"""
+
+
                 
        
 
