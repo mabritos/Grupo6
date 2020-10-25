@@ -25,6 +25,7 @@ class FaceDetection(object):
         self.YAWN_THRESH = 25
         self.face_detected = False
         self.yawn_counter = 0
+        self.CAR_REGISTRATION = 'SAF 6245'
 
         self.blink_verification = False
         self.blink_counter = 0
@@ -162,7 +163,7 @@ class FaceDetection(object):
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
                 self.alarm.text_to_speech("El conductor se esta durmiendo")
-                self.csv_input('SAF 6245',self.EVENT_STRING_SLEEP,'Not found','35')
+                self.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,'Not found','35')
                 
                 
 
@@ -195,7 +196,7 @@ class FaceDetection(object):
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     self.blink_time_alert_counter_a = []
                     self.alarm.text_to_speech("usted presenta sintomas de sueno")
-                    self.csv_input('SAF 6245',self.EVENT_STRING_DROWSINESS,'Not found','60')
+                    self.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,'Not found','60')
                     #self.alarm.yawn_alert()
         else:
             self.blink_counter_verification = True
