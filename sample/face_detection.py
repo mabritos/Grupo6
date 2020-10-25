@@ -7,8 +7,6 @@ import numpy as np
 import os
 import time
 import math
-import csv
-import base64
 from alarms import Alarms
 from datetime import datetime
 from csv_handler import CsvHandler
@@ -155,7 +153,7 @@ class FaceDetection(object):
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
                 self.alarm.text_to_speech("El conductor se esta durmiendo")
-                CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,'Not found','35')
+                CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())+'',str(self.gps.get_speed()), self.frame)
                 
                 
 
@@ -188,7 +186,7 @@ class FaceDetection(object):
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     self.blink_time_alert_counter_a = []
                     self.alarm.text_to_speech("usted presenta sintomas de sueno")
-                    CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,'Not found','60')
+                    CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon()),str(self.gps.get_speed()), self.frame)
                     #self.alarm.yawn_alert()
         else:
             self.blink_counter_verification = True
