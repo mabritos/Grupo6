@@ -1,10 +1,12 @@
 import cv2
 from api import Api
 from face_detection import FaceDetection
+from gps_data import GpsData
 
 
 face_detection = FaceDetection()
 api = Api()
+gps = GpsData()
 
 webcam = cv2.VideoCapture(0)
 
@@ -19,6 +21,8 @@ while face_detection.face_detected == False:
 face_detection.initial_setup()
 
 while True:
+    
+    print(GpsData.get_speed())
     # Obtenemos un nuevo frame
     _, frame = webcam.read()
     
