@@ -7,7 +7,10 @@ import numpy as np
 import os
 import time
 import math
+import csv
+import base64
 from alarms import Alarms
+from datetime import datetime
 
 class FaceDetection(object):
     """Esta clase detecta un rostro y sus landmarks"""
@@ -39,7 +42,8 @@ class FaceDetection(object):
         self.YAWN_TIME_GAP=60 #
         self.YAWN_TIME_ALERT=3 # Cantidad de bostetzos por minuto para que se active la alarma
         self.yawn_time_alert_counter_a= [] #se guardan los bostezos (se guarda en formato time)
-
+        self.EVENT_STRING_DROWSINESS= 'El conductor presenta síntomas de sueño'
+        self.EVENT_STRING_SLEEP= 'El conductor se esta durmiendo'
         self.face_angle_vertical = 0.0
         self.face_angle_horizontal = 0.0
         self.face_angle_horizontal = 0.0
@@ -69,15 +73,21 @@ class FaceDetection(object):
             self.left_eye = None
             self.right_eye = None
 
+    def csv_input(self,car_id,event,location,speed):
+        cv2.imwrite("frame.jpg", self.frame)
+        with open("frame.jpg", "rb") as imageFile:
+            image_aux = base64.b64encode(imageFile.read())
+            image = image_aux[2:]
+        with open('Datos.csv','a') as f:
+            thewriter = csv.writer(f)
+            thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d %H:%M:%S'),event,image,location,speed])
 
     def refresh(self, frame):
         """Refresca el frame y lo analiza."""
 
         self.frame = frame
         self._analyze()
-        
-        
-    
+          
     def final_ear(self, shape):
         """ Setea los ojos y las orejas """
 
@@ -147,8 +157,10 @@ class FaceDetection(object):
         if self.ear < self.EYE_AR_THRESH:
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
-                self.alarm.sleeping_alert()
-               
+                self.alarm.text_to_speech("El conductor se esta durmiendo")
+                self.csv_input('SAF 6245',self.EVENT_STRING_SLEEP,'Not found','35')
+                
+                
 
         else:
             self.counter = time.time()
@@ -177,9 +189,10 @@ class FaceDetection(object):
                 self.blink_eye_closed = 0
                 print("Se subio el contador de sintomas (pestaneos) en 1", self.blink_time_alert_counter_a)
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
-                    self.alarm.blink_alert()
-                    #Agregar al csv con accion y tiempo
                     self.blink_time_alert_counter_a = []
+                    self.alarm.text_to_speech("usted presenta sintomas de sueno")
+                    self.csv_input('SAF 6245',self.EVENT_STRING_DROWSINESS,'Not found','60')
+                    #self.alarm.yawn_alert()
         else:
             self.blink_counter_verification = True
             self.blink_eye_closed = 0
