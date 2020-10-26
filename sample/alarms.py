@@ -1,13 +1,15 @@
 from gtts import gTTS
 import os
 import time
+import threading
 
 class Alarms():
 
     def __init__(self):
         self.last_timestamp = 0
         self.initial_timestamp = 0
-
+        self.thread = MyThread()
+        
     def lost_face(self):
         actual_timestamp = time.time()
         if (actual_timestamp - self.last_timestamp > 2): #si del ultimo timestamp hasta ahora paso 1 segundo, entonces reinicio el timer
@@ -37,11 +39,15 @@ class Alarms():
         print("el conductor se ah dormido!!!!!!!")
         self.text_to_speech("Cuidado el conductor se a dormido")
 
-
-        
-    
-
     def text_to_speech(self, text):
+        self.thread.start(text)
+        
+
+class MyThread(threading.Thread):
+    def __init__(self):
+        super(MyThread, self).__init__()
+        # Can setup other things before the thread starts
+    def run(self, text):
         tts = gTTS(text=text, lang='es')
         tts.save("good.mp3")
         os.system("mpg321 good.mp3")
