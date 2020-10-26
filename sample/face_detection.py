@@ -368,8 +368,8 @@ class FaceDetection(object):
     def initial_setup(self):
         """Setup de los angulos iniciales de euler de la cabeza"""
 
-        self.alarm.text_to_speech("Bienvenido al asistente de conducción de UNASEV, Por favor póngase en una posición cómoda de manejo y espere 5 segundos")
-        time.sleep(5)
+        self.alarm.text_to_speech("Bienvenido al asistente de conducción de unasev, Por favor póngase en una posición cómoda de manejo y espere unos segundos")
+        time.sleep(10)
         self.head_pose_estimation()
         self.initial_face_angle_vertical = self.face_angle_vertical
         self.initial_face_angle_horizontal = self.face_angle_horizontal

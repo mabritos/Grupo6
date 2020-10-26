@@ -8,7 +8,7 @@ class Alarms():
     def __init__(self):
         self.last_timestamp = 0
         self.initial_timestamp = 0
-        self.thread = MyThread()
+        
         
     def lost_face(self):
         actual_timestamp = time.time()
@@ -40,14 +40,24 @@ class Alarms():
         self.text_to_speech("Cuidado el conductor se a dormido")
 
     def text_to_speech(self, text):
-        self.thread.start(text)
+        thread = MyThread(text)
+        thread.start()
+        
+        
+            
+        
+        
         
 
 class MyThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, text):
         super(MyThread, self).__init__()
+        self.text = text
         # Can setup other things before the thread starts
-    def run(self, text):
-        tts = gTTS(text=text, lang='es')
+    def run(self):
+        print('Thread alarma iniciado')
+        self.text_threaded()
+    def text_threaded(self):
+        tts = gTTS(text=self.text, lang='es')
         tts.save("good.mp3")
         os.system("mpg321 good.mp3")
