@@ -7,10 +7,9 @@ import numpy as np
 import os
 import time
 import math
-import csv
-import base64
 from alarms import Alarms
 from datetime import datetime
+from csv_handler import CsvHandler
 
 class FaceDetection(object):
     """Esta clase detecta un rostro y sus landmarks"""
@@ -25,6 +24,7 @@ class FaceDetection(object):
         self.YAWN_THRESH = 25
         self.face_detected = False
         self.yawn_counter = 0
+        self.CAR_REGISTRATION = 'SAF 6245'
 
         self.blink_verification = False
         self.blink_counter = 0
@@ -55,6 +55,9 @@ class FaceDetection(object):
 
         #_predictor es usado para obtener los landmarks de una cara
         self._predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+        
+    def set_gps(self, gps):
+        self.gps = gps
 
     def _analyze(self):
         """Detecta un rostro y todos sus landmarks"""
@@ -73,15 +76,7 @@ class FaceDetection(object):
             self.left_eye = None
             self.right_eye = None
 
-    def csv_input(self,car_id,event,location,speed):
-        cv2.imwrite("frame.jpg", self.frame)
-        with open("frame.jpg", "rb") as imageFile:
-            image_aux = base64.b64encode(imageFile.read())
-            image = image_aux[2:]
-        with open('Datos.csv','a') as f:
-            thewriter = csv.writer(f)
-            thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d %H:%M:%S'),event,image,location,speed])
-
+    
     def refresh(self, frame):
         """Refresca el frame y lo analiza."""
 
@@ -158,7 +153,7 @@ class FaceDetection(object):
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
                 self.alarm.text_to_speech("El conductor se esta durmiendo")
-                self.csv_input('SAF 6245',self.EVENT_STRING_SLEEP,'Not found','35')
+                CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())+'',str(self.gps.get_speed()), self.frame)
                 
                 
 
@@ -191,7 +186,7 @@ class FaceDetection(object):
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     self.blink_time_alert_counter_a = []
                     self.alarm.text_to_speech("usted presenta sintomas de sueno")
-                    self.csv_input('SAF 6245',self.EVENT_STRING_DROWSINESS,'Not found','60')
+                    CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon()),str(self.gps.get_speed()), self.frame)
                     #self.alarm.yawn_alert()
         else:
             self.blink_counter_verification = True
@@ -373,8 +368,8 @@ class FaceDetection(object):
     def initial_setup(self):
         """Setup de los angulos iniciales de euler de la cabeza"""
 
-        self.alarm.text_to_speech("Bienvenido al asistente de conducción de UNASEV, Por favor póngase en una posición cómoda de manejo y espere 5 segundos")
-        time.sleep(5)
+        self.alarm.text_to_speech("Bienvenido al asistente de conducción de unasev, Por favor póngase en una posición cómoda de manejo y espere unos segundos")
+        time.sleep(10)
         self.head_pose_estimation()
         self.initial_face_angle_vertical = self.face_angle_vertical
         self.initial_face_angle_horizontal = self.face_angle_horizontal
