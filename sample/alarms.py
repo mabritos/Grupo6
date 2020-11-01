@@ -4,15 +4,16 @@ import time
 import threading
 import queue
 
-alarm_queue = Queue()
+alarm_queue = queue.Queue()
 
 class Alarms():
 
     def __init__(self):
         self.last_timestamp = 0
         self.initial_timestamp = 0
-        thread = MyThread()
-        thread.start()
+        self.thread = MyThread()
+        self.thread.daemon = True
+        self.thread.start()
         
         
         
