@@ -19,15 +19,18 @@ class Alarms():
         
     def lost_face(self):
         actual_timestamp = time.time()
+        distraction_detected = False
         if (actual_timestamp - self.last_timestamp > 2): #si del ultimo timestamp hasta ahora paso 1 segundo, entonces reinicio el timer
             self.initial_timestamp = actual_timestamp
             print('Reset timer alarma')
             
         elif (actual_timestamp - self.initial_timestamp > 5): #si del timestamp inicial hasta ahora pasaron mas de 5 segundos. Osea, paso 5 segundos distraido
             self.initial_timestamp = actual_timestamp
+            distraction_detected = True
             self.text_to_speech('Por favor, no se distraiga al volante')
         
         self.last_timestamp = actual_timestamp
+        return distraction_detected
 
 
     def yawn_alert(self):

@@ -12,3 +12,4 @@ class CsvHandler():
             with open('Datos.csv','a') as f:
                 thewriter = csv.writer(f)
                 thewriter.writerow([car_id,datetime.today().strftime('%Y-%m-%d %H:%M:%S'),event,image,location,speed])
+                
