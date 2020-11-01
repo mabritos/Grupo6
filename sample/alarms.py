@@ -2,12 +2,18 @@ from gtts import gTTS
 import os
 import time
 import threading
+import queue
+
+alarm_queue = Queue()
 
 class Alarms():
 
     def __init__(self):
         self.last_timestamp = 0
         self.initial_timestamp = 0
+        thread = MyThread()
+        thread.start()
+        
         
         
     def lost_face(self):
@@ -40,8 +46,7 @@ class Alarms():
         self.text_to_speech("Cuidado el conductor se a dormido")
 
     def text_to_speech(self, text):
-        thread = MyThread(text)
-        thread.start()
+        alarm_queue.put(text)
         
         
             
@@ -50,14 +55,16 @@ class Alarms():
         
 
 class MyThread(threading.Thread):
-    def __init__(self, text):
+    def __init__(self):
         super(MyThread, self).__init__()
-        self.text = text
-        # Can setup other things before the thread starts
+
     def run(self):
         print('Thread alarma iniciado')
-        self.text_threaded()
-    def text_threaded(self):
-        tts = gTTS(text=self.text, lang='es')
+        while(True):
+            if (alarm_queue.empty() == False):
+                self.text_threaded(alarm_queue.get())
+
+    def text_threaded(self, text):
+        tts = gTTS(text=text, lang='es')
         tts.save("good.mp3")
         os.system("mpg321 good.mp3")
