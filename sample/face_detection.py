@@ -44,6 +44,7 @@ class FaceDetection(object):
         self.yawn_time_alert_counter_a= [] #se guardan los bostezos (se guarda en formato time)
         self.EVENT_STRING_DROWSINESS= 'El conductor presenta síntomas de sueño'
         self.EVENT_STRING_SLEEP= 'El conductor se esta durmiendo'
+        self.EVENT_STRING_DISTRACTION = 'El conductor se distrajo'
         self.face_angle_vertical = 0.0
         self.face_angle_horizontal = 0.0
         self.face_angle_horizontal = 0.0
@@ -386,9 +387,8 @@ class FaceDetection(object):
         #angulo = self.initial_face_angle_vertical + vertical_threshold
         horizontal_lower_bound = self.initial_face_angle_horizontal - horizontal_threshold
         horizontal_upper_bound = self.initial_face_angle_horizontal + horizontal_threshold
-        if self.face_angle_vertical < vertical_lower_bound:
-            self.alarm.lost_face()
-        if self.face_angle_horizontal < horizontal_lower_bound:
-            self.alarm.lost_face()
-        if self.face_angle_horizontal > horizontal_upper_bound:
-            self.alarm.lost_face()
+        if (self.face_angle_vertical < vertical_lower_bound or self.face_angle_horizontal < horizontal_lower_bound or self.face_angle_horizontal > horizontal_upper_bound):
+            if(self.alarm.lost_face()):
+                CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DISTRACTION,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())+'',str(self.gps.get_speed()), self.frame)
+                print("Distraccion detectada y registrada")
+        

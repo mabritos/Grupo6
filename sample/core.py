@@ -16,7 +16,7 @@ webcam = cv2.VideoCapture(0)
 while face_detection.face_detected == False:
     _, frame = webcam.read()
     
-    frame = cv2.resize(frame, (511,288))
+    frame = cv2.resize(frame, (480,280))
 
     face_detection.refresh(frame)
 
@@ -24,11 +24,11 @@ face_detection.initial_setup()
 
 while True:
     print(gps.get_speed())
-    if (gps.get_speed() > 0):
+    if (True): #gps.get_speed() > 0
     # Obtenemos un nuevo frame
         _, frame = webcam.read()
     
-        frame = cv2.resize(frame, (511,288))
+        frame = cv2.resize(frame, (480,280))
     
     # Mandamos el frame a FaceDetection para analizarlo
         face_detection.refresh(frame)
