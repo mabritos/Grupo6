@@ -4,3 +4,5 @@ imutils
 scipy
 argparse
 gps3
+gtts
+mpyg321
