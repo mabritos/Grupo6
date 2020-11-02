@@ -3,3 +3,4 @@ opencv-contrib-python==4.1.0.25
 imutils
 scipy
 argparse
+gps3
