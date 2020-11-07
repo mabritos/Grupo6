@@ -33,16 +33,12 @@ class Alarms():
         return distraction_detected
 
 
-    def text_to_speech(self, text):
+    def text_to_speech(self, text = None):
         alarm_queue.put(text)
 
-    def ring_alarm(self):
-        os.system("mpg321 alarm.mp3")
-        
+    
+
             
-        
-        
-        
 
 class MyThread(threading.Thread):
     def __init__(self):
@@ -55,6 +51,9 @@ class MyThread(threading.Thread):
                 self.text_threaded(alarm_queue.get())
 
     def text_threaded(self, text):
-        tts = gTTS(text=text, lang='es')
-        tts.save("good.mp3")
-        os.system("mpg321 good.mp3")
+        if text is None:
+            os.system("mpg321 alarm.mp3")
+        else:
+            tts = gTTS(text=text, lang='es')
+            tts.save("good.mp3")
+            os.system("mpg321 good.mp3")

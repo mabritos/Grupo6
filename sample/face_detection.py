@@ -77,7 +77,7 @@ class FaceDetection(object):
             self.left_eye = None
             self.right_eye = None
 
-    
+
     def refresh(self, frame):
         """Refresca el frame y lo analiza."""
 
@@ -142,7 +142,7 @@ class FaceDetection(object):
         if self.ear < self.EYE_AR_THRESH:
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
-                self.alarm.text_to_speech("El conductor se esta durmiendo") #El conductor se durmió
+                self.alarm.text_to_speech() #El conductor se durmió
                 CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())+'',str(self.gps.get_speed()), self.frame)
                 
                 
@@ -177,7 +177,7 @@ class FaceDetection(object):
                     self.blink_time_alert_counter_a = []
                     self.alarm.text_to_speech("usted presenta sintomas de sueno")
                     CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon()),str(self.gps.get_speed()), self.frame)
-                    #self.alarm.yawn_alert()
+                    
         else:
             self.blink_counter_verification = True
             self.blink_eye_closed = 0
