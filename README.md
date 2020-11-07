@@ -21,7 +21,7 @@ Instalar librería dlib
 conda install -c conda-forge dlib
 ```
 ### Programa
-Ejecutar __init_ _.py:
+Ejecutar core.py:
 ```
-python __init__.py
+python core.py
 ```
