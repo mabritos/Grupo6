@@ -20,7 +20,7 @@ class FaceDetection(object):
         self.frame = None
         self.counter = 0
         self.EYE_AR_THRESH = 0.15
-        self.EYE_AR_CONSEC_FRAMES = 3
+        self.EYE_AR_CONSEC_FRAMES = 2
         self.YAWN_THRESH = 25
         self.face_detected = False
         self.yawn_counter = 0
@@ -175,7 +175,7 @@ class FaceDetection(object):
                 print("Se subio el contador de sintomas (pestaneos) en 1", self.blink_time_alert_counter_a)
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     self.blink_time_alert_counter_a = []
-                    self.alarm.text_to_speech("usted presenta sintomas de sueno")
+                    self.alarm.text_to_speech("se ha detectado un sintoma de suenio, le recomendamos descansar antes de seguir manejando")
                     CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon()),str(self.gps.get_speed()), self.frame)
                     
         else:
@@ -201,7 +201,7 @@ class FaceDetection(object):
                 self.yawn_time_alert_counter_a.append(time.time())
                 print("se a incrementado en 1 bostezos", self.yawn_time_alert_counter_a)
                 if len(self.yawn_time_alert_counter_a) == self.YAWN_TIME_ALERT:
-                    self.alarm.text_to_speech("Es probable que se este durmiendo, tengan cuidado")
+                    self.alarm.text_to_speech("se ha detectado un sintoma de suenio, le recomendamos descansar antes de seguir manejando")
                     self.yawn_time_alert_counter_a = []
         else:
             self.yawn_counter_verification = True 
