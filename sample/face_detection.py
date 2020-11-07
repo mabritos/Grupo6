@@ -204,7 +204,8 @@ class FaceDetection(object):
 
         # bostezos
 
-        if self.lips_distance > self.YAWN_THRESH:
+        if self.lips_distance > self.YAWN_THRESH and self.t_end == 0:
+            self.t_end = time.time() + 5
             if self.yawn_counter_verification == True :
                 self.yawn_counter_verification = False
                 self.yawn_time_alert_counter_a.append(time.time())
@@ -221,7 +222,8 @@ class FaceDetection(object):
                 print("se elimino un lemento (Bostezo) porque paso un min",self.yawn_time_alert_counter_a)
 
 
-
+        if(time.time() > self.t_end):
+            self.t_end = 0
 
         #codigo de bsotezo de referencia
         """if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
