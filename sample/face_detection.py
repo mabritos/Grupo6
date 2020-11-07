@@ -82,6 +82,7 @@ class FaceDetection(object):
         """Refresca el frame y lo analiza."""
 
         self.frame = frame
+        self.frame_clean = frame
         self._analyze()
           
     def final_ear(self, shape):
@@ -327,10 +328,10 @@ class FaceDetection(object):
         pitch = "Vertical: {}".format(self.face_angle_vertical)
         yaw = "Horizontal: {}".format(self.face_angle_horizontal)
 
-        cv2.putText(self.frame, pitch, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (0, 0, 255), 2)
-        cv2.putText(self.frame, yaw, (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (0, 255, 0), 2)
+        #cv2.putText(self.frame, pitch, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+         #           0.5, (0, 0, 255), 2)
+        #cv2.putText(self.frame, yaw, (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+         #           0.5, (0, 255, 0), 2)
 
     def get_euler_angles(self, camera_rot_matrix):
         """Obtener los angulos de Euler de la cabeza"""
