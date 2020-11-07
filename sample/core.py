@@ -23,13 +23,8 @@ while face_detection.face_detected == False:
 face_detection.initial_setup()
 
 while True:
-<<<<<<< HEAD
-    #print(gps.get_speed())
-    if True:
-=======
     print(gps.get_speed())
     if (True): #gps.get_speed() > 0
->>>>>>> d1468f9281e0d534d5ff152fd05bceaf384be017
     # Obtenemos un nuevo frame
         _, frame = webcam.read()
     
