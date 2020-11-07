@@ -35,7 +35,9 @@ class Alarms():
 
     def text_to_speech(self, text):
         alarm_queue.put(text)
-        
+
+    def ring_alarm(self):
+        os.system("mpg321 alarm.mp3")
         
             
         
