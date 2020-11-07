@@ -20,7 +20,7 @@ class FaceDetection(object):
         self.frame = None
         self.counter = 0
         self.EYE_AR_THRESH = 0.15
-        self.EYE_AR_CONSEC_FRAMES = 3
+        self.EYE_AR_CONSEC_FRAMES = 2
         self.YAWN_THRESH = 25
         self.face_detected = False
         self.yawn_counter = 0
