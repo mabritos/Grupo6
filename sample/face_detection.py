@@ -82,6 +82,7 @@ class FaceDetection(object):
         """Refresca el frame y lo analiza."""
 
         self.frame = frame
+        self.frame_clean = frame
         self._analyze()
           
     def final_ear(self, shape):
@@ -193,7 +194,8 @@ class FaceDetection(object):
 
         # bostezos
 
-        if self.lips_distance > self.YAWN_THRESH:
+        if self.lips_distance > self.YAWN_THRESH and self.t_end == 0:
+            self.t_end = time.time() + 5
             if self.yawn_counter_verification == True :
                 self.yawn_counter_verification = False
                 self.yawn_time_alert_counter_a.append(time.time())
@@ -210,6 +212,8 @@ class FaceDetection(object):
                 print("se elimino un lemento (Bostezo) porque paso un min",self.yawn_time_alert_counter_a)
 
 
+        if(time.time() > self.t_end):
+            self.t_end = 0
 
                 
        
@@ -278,10 +282,10 @@ class FaceDetection(object):
         pitch = "Vertical: {}".format(self.face_angle_vertical)
         yaw = "Horizontal: {}".format(self.face_angle_horizontal)
 
-        cv2.putText(self.frame, pitch, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (0, 0, 255), 2)
-        cv2.putText(self.frame, yaw, (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (0, 255, 0), 2)
+        #cv2.putText(self.frame, pitch, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+         #           0.5, (0, 0, 255), 2)
+        #cv2.putText(self.frame, yaw, (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+         #           0.5, (0, 255, 0), 2)
 
     def get_euler_angles(self, camera_rot_matrix):
         """Obtener los angulos de Euler de la cabeza"""

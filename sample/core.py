@@ -34,7 +34,7 @@ while True:
         face_detection.refresh(frame)
 
     # Mostrar en el frame los landmarks
-        face_detection.draw_landmarks()
+       # face_detection.draw_landmarks()
 
     # Buscar sintomas de sueño
         if face_detection.face_detected:
