@@ -33,22 +33,6 @@ class Alarms():
         return distraction_detected
 
 
-    def yawn_alert(self):
-        print( "se a detectado un sintoma de sueno (Bostezo)" )
-        self.text_to_speech("Es probable que se este durmiendo, tengan cuidado")
-        
-        """tts = gTTS(text='Se han detectado sintomas de suenio', lang='es')
-        tts.save("good.mp3")
-        os.system("mpg321 good.mp3") """
-
-    def blink_alert(self):
-        print("Se a detectado un sintoma se sueno (pestaneo)")
-        self.text_to_speech("Es probable que se este durmiendo, tengan cuidado")
-
-    def sleeping_alert(self):
-        print("el conductor se ah dormido!!!!!!!")
-        self.text_to_speech("Cuidado el conductor se a dormido")
-
     def text_to_speech(self, text):
         alarm_queue.put(text)
         

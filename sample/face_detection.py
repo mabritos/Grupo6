@@ -136,24 +136,12 @@ class FaceDetection(object):
     def check_drowsiness(self):
         """Conteo de pestaneos, bostezos y detección de sueño"""
 
-       
         self.blink_drowsiness_symptoms = 8
-       
-    
-        """if self.ear < self.EYE_AR_THRESH:
-            self.counter += 1
-
-            if self.counter >= self.EYE_AR_CONSEC_FRAMES:
-                cv2.putText(self.frame, "DROWSINESS ALERT!", (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-
-        else:
-            self.counter = 0"""
 
         if self.ear < self.EYE_AR_THRESH:
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
-                self.alarm.text_to_speech("El conductor se esta durmiendo")
+                self.alarm.text_to_speech("El conductor se esta durmiendo") #El conductor se durmió
                 CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())+'',str(self.gps.get_speed()), self.frame)
                 
                 
@@ -211,7 +199,7 @@ class FaceDetection(object):
                 self.yawn_time_alert_counter_a.append(time.time())
                 print("se a incrementado en 1 bostezos", self.yawn_time_alert_counter_a)
                 if len(self.yawn_time_alert_counter_a) == self.YAWN_TIME_ALERT:
-                    self.alarm.yawn_alert()
+                    self.alarm.text_to_speech("Es probable que se este durmiendo, tengan cuidado")
                     self.yawn_time_alert_counter_a = []
         else:
             self.yawn_counter_verification = True 
@@ -221,32 +209,6 @@ class FaceDetection(object):
                 self.yawn_time_alert_counter_a.pop(0)
                 print("se elimino un lemento (Bostezo) porque paso un min",self.yawn_time_alert_counter_a)
 
-
-
-
-        #codigo de bsotezo de referencia
-        """if (self.lips_distance > self.YAWN_THRESH and self.t_end == 0):
-                self.yawn_time_alert_counter_a.append(time.time())
-                self.t_end = time.time() + 5
-                self.yawn_counter += 1
-                cv2.putText(self.frame, "Yawn Alert", (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                if(self.yawn_counter == self.YAWN_TIME_ALERT):
-                     self.alarm.yawn_alert()
-                     self.yawn_counter = 0
-                
-               
-
-        if(time.time() > self.t_end):
-            self.t_end = 0
-        
-        # Borra los bostezos despues de un minuto   
-        if len(self.yawn_time_alert_counter_a) > 0 :
-            if self.yawn_time_alert_counter_a[0]  <= (time.time() - self.YAWN_TIME_GAP) :
-                self.yawn_time_alert_counter_a.pop(0)
-                # verificar que este bien 
-                self.yawn_counter=0
-                self.alarm.yawn_alert()"""
 
 
                 
@@ -313,15 +275,6 @@ class FaceDetection(object):
         euler_angles[0] = self.face_angle_vertical
         euler_angles[1] = self.face_angle_horizontal
         
-        # TODO: Draw head angles
-        # renderHeadAngles(frame, rvec, tvec, camera_matrix)
-
-        # Draw used points for head pose estimation
-        # for point in image_points:
-        #     print(point[0])
-        #     cv2.circle(frame, (point[0], point[1]), 3, (255, 0, 255), -1)
-
-        # Draw face angles
         pitch = "Vertical: {}".format(self.face_angle_vertical)
         yaw = "Horizontal: {}".format(self.face_angle_horizontal)
 
@@ -384,7 +337,6 @@ class FaceDetection(object):
         vertical_threshold = 10
         horizontal_threshold = 25
         vertical_lower_bound = self.initial_face_angle_vertical - vertical_threshold
-        #angulo = self.initial_face_angle_vertical + vertical_threshold
         horizontal_lower_bound = self.initial_face_angle_horizontal - horizontal_threshold
         horizontal_upper_bound = self.initial_face_angle_horizontal + horizontal_threshold
         if (self.face_angle_vertical < vertical_lower_bound or self.face_angle_horizontal < horizontal_lower_bound or self.face_angle_horizontal > horizontal_upper_bound):
