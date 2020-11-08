@@ -1,4 +1,3 @@
-from gtts import gTTS
 import os
 import time
 import threading
@@ -27,7 +26,7 @@ class Alarms():
         elif (actual_timestamp - self.initial_timestamp > 3): #si del timestamp inicial hasta ahora pasaron mas de 5 segundos. Osea, paso 5 segundos distraido
             self.initial_timestamp = actual_timestamp
             distraction_detected = True
-            self.text_to_speech('Por favor, no se distraiga al volante')
+            self.text_to_speech('distraction_alert')
         
         self.last_timestamp = actual_timestamp
         return distraction_detected
@@ -51,12 +50,7 @@ class MyThread(threading.Thread):
                 self.text_threaded(alarm_queue.get())
 
     def text_threaded(self, text):
-        if text is "alarma":
-            os.system("mpg321 alarm.mp3")
-        else:
-            try:
-                tts = gTTS(text=text, lang='es')
-                tts.save("good.mp3")
-                os.system("mpg321 good.mp3")
-            except:
-                print("Alarma salteada") 
+        try:
+            os.system("mpg321 "+text+".mp3")
+        except:
+            print("Alarma salteada") 

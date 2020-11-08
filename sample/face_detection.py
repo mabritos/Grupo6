@@ -142,7 +142,7 @@ class FaceDetection(object):
         if self.ear < self.EYE_AR_THRESH:
             if ((self.counter <= time.time() - self.EYE_AR_CONSEC_FRAMES) and self.t_end_blink == 0 ):
                 self.t_end_blink = time.time() + 5
-                self.alarm.text_to_speech("alarma") #El conductor se durmió
+                self.alarm.text_to_speech("alarm") #El conductor se durmió
                 CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_SLEEP,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())+'',str(self.gps.get_speed()), self.frame)
                 
                 
@@ -175,7 +175,7 @@ class FaceDetection(object):
                 print("Se subio el contador de sintomas (pestaneos) en 1", self.blink_time_alert_counter_a)
                 if len(self.blink_time_alert_counter_a) == self.BLINK_TIME_ALERT  :
                     self.blink_time_alert_counter_a = []
-                    self.alarm.text_to_speech("se ha detectado un sintoma de suenio, le recomendamos descansar antes de seguir manejando")
+                    self.alarm.text_to_speech("drows_alert")
                     CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DROWSINESS,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon()),str(self.gps.get_speed()), self.frame)
                     
         else:
@@ -201,7 +201,7 @@ class FaceDetection(object):
                 self.yawn_time_alert_counter_a.append(time.time())
                 print("se a incrementado en 1 bostezos", self.yawn_time_alert_counter_a)
                 if len(self.yawn_time_alert_counter_a) == self.YAWN_TIME_ALERT:
-                    self.alarm.text_to_speech("se ha detectado un sintoma de suenio, le recomendamos descansar antes de seguir manejando")
+                    self.alarm.text_to_speech("drows_alert")
                     self.yawn_time_alert_counter_a = []
         else:
             self.yawn_counter_verification = True 
@@ -326,14 +326,14 @@ class FaceDetection(object):
     def initial_setup(self):
         """Setup de los angulos iniciales de euler de la cabeza"""
 
-        self.alarm.text_to_speech("Bienvenido al asistente de conducción de unasev, Por favor póngase en una posición cómoda de manejo y espere unos segundos")
+        self.alarm.text_to_speech("introduction")
         time.sleep(10)
         self.head_pose_estimation()
         self.initial_face_angle_vertical = self.face_angle_vertical
         self.initial_face_angle_horizontal = self.face_angle_horizontal
         
         print ('Angulo vertical: ',self.initial_face_angle_vertical, ' Angulo horizontal: ', self.initial_face_angle_horizontal)
-        self.alarm.text_to_speech("Proceso de configuración finalizado, que tenga un buen viaje")
+        self.alarm.text_to_speech("configuration_finished")
 
     def check_distraction(self):
         """Se detecta una distraccion en caso de que se pase un umbral con respecto a los angulos de euler originales"""
