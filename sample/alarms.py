@@ -33,7 +33,7 @@ class Alarms():
         return distraction_detected
 
 
-    def text_to_speech(self, text = None):
+    def text_to_speech(self, text):
         alarm_queue.put(text)
 
     
