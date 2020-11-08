@@ -51,7 +51,7 @@ class MyThread(threading.Thread):
                 self.text_threaded(alarm_queue.get())
 
     def text_threaded(self, text):
-        if text is None:
+        if text is "alarma":
             os.system("mpg321 alarm.mp3")
         else:
             try:
