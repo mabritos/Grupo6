@@ -54,6 +54,9 @@ class MyThread(threading.Thread):
         if text is None:
             os.system("mpg321 alarm.mp3")
         else:
-            tts = gTTS(text=text, lang='es')
-            tts.save("good.mp3")
-            os.system("mpg321 good.mp3")
+            try:
+                tts = gTTS(text=text, lang='es')
+                tts.save("good.mp3")
+                os.system("mpg321 good.mp3")
+            except:
+                print("Alarma salteada") 
