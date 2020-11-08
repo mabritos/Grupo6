@@ -24,7 +24,7 @@ class Alarms():
             self.initial_timestamp = actual_timestamp
             print('Reset timer alarma')
             
-        elif (actual_timestamp - self.initial_timestamp > 5): #si del timestamp inicial hasta ahora pasaron mas de 5 segundos. Osea, paso 5 segundos distraido
+        elif (actual_timestamp - self.initial_timestamp > 3): #si del timestamp inicial hasta ahora pasaron mas de 5 segundos. Osea, paso 5 segundos distraido
             self.initial_timestamp = actual_timestamp
             distraction_detected = True
             self.text_to_speech('Por favor, no se distraiga al volante')
