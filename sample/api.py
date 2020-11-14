@@ -1,5 +1,8 @@
 import time
 import requests
+import os
+
+path = os.path.dirname(os.path.realpath(__file__))
 
 class Api:
 
@@ -11,7 +14,7 @@ class Api:
         if (actual_timestamp - self.initial_timestamp > 600):
             self.initial_timestamp = actual_timestamp
             
-            with open('Datos.csv') as f:
+            with open(path+'/Datos.csv') as f:
                 csv = f.read()
             
             data = {"csv": csv}

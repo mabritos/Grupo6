@@ -2,6 +2,7 @@ import cv2
 from api import Api
 from face_detection import FaceDetection
 from gps_data import GpsData
+import os
 
 
 gps = GpsData()
@@ -23,7 +24,7 @@ while face_detection.face_detected == False:
 face_detection.initial_setup()
 
 while True:
-    print(gps.get_speed())
+    #print(gps.get_speed())
     if (True): #gps.get_speed() > 0
     # Obtenemos un nuevo frame
         _, frame = webcam.read()
@@ -36,7 +37,7 @@ while True:
     # Mostrar en el frame los landmarks
        # face_detection.draw_landmarks()
 
-    # Buscar sintomas de sueño
+    # Buscar sintomas de sueno
         if face_detection.face_detected:
             face_detection.check_drowsiness()
             face_detection.head_pose_estimation()

@@ -11,6 +11,8 @@ from alarms import Alarms
 from datetime import datetime
 from csv_handler import CsvHandler
 
+path = os.path.dirname(os.path.realpath(__file__))
+
 class FaceDetection(object):
     """Esta clase detecta un rostro y sus landmarks"""
 
@@ -55,7 +57,7 @@ class FaceDetection(object):
         self._face_detector = dlib.get_frontal_face_detector()
 
         #_predictor es usado para obtener los landmarks de una cara
-        self._predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+        self._predictor = dlib.shape_predictor(path+"/shape_predictor_68_face_landmarks.dat")
         
     def set_gps(self, gps):
         self.gps = gps

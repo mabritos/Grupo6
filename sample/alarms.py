@@ -4,6 +4,7 @@ import threading
 import queue
 
 alarm_queue = queue.Queue()
+path = os.path.dirname(os.path.realpath(__file__))
 
 class Alarms():
 
@@ -51,6 +52,6 @@ class MyThread(threading.Thread):
 
     def text_threaded(self, text):
         try:
-            os.system("mpg321 "+text+".mp3")
+            os.system("mpg321 "+path+"/"+text+".mp3")
         except:
             print("Alarma salteada") 
