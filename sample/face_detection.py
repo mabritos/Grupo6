@@ -44,9 +44,9 @@ class FaceDetection(object):
         self.YAWN_TIME_GAP=60 #
         self.YAWN_TIME_ALERT=3 # Cantidad de bostetzos por minuto para que se active la alarma
         self.yawn_time_alert_counter_a= [] #se guardan los bostezos (se guarda en formato time)
-        self.EVENT_STRING_DROWSINESS= 'El conductor presenta síntomas de sueño'
-        self.EVENT_STRING_SLEEP= 'El conductor se esta durmiendo'
-        self.EVENT_STRING_DISTRACTION = 'El conductor se distrajo'
+        self.EVENT_STRING_DROWSINESS= 'Sintomas de suenio'
+        self.EVENT_STRING_SLEEP= 'Dormido'
+        self.EVENT_STRING_DISTRACTION = 'Distraccion'
         self.face_angle_vertical = 0.0
         self.face_angle_horizontal = 0.0
         self.face_angle_horizontal = 0.0

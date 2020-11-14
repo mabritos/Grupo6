@@ -9,7 +9,7 @@ path = os.path.dirname(os.path.realpath(__file__))
 class CsvHandler():
 
     def csv_input(car_id,event,location,speed, frame):
-            cv2.imwrite("frame.jpg", frame)
+            cv2.imwrite(path+"/frame.jpg", frame)
             with open(path+"/frame.jpg", "rb") as imageFile:
                 image = base64.b64encode(imageFile.read())
             with open(path+'/Datos.csv','a') as f:

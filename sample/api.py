@@ -11,7 +11,7 @@ class Api:
 
     def send_csv(self):
         actual_timestamp = time.time()
-        if (actual_timestamp - self.initial_timestamp > 600):
+        if (actual_timestamp - self.initial_timestamp > 60):
             self.initial_timestamp = actual_timestamp
             
             with open(path+'/Datos.csv') as f:
