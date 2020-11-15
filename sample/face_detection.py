@@ -23,7 +23,7 @@ class FaceDetection(object):
         self.counter = 0
         self.EYE_AR_THRESH = 0.15
         self.EYE_AR_CONSEC_FRAMES = 2
-        self.YAWN_THRESH = 25
+        self.YAWN_THRESH = 10
         self.face_detected = False
         self.yawn_counter = 0
         self.CAR_REGISTRATION = 'SAF 6245'
@@ -42,8 +42,9 @@ class FaceDetection(object):
         self.yawn_counter_verification = False
         self.t_end = 0 #Variable para controlar el tiempo de un bostezo
         self.YAWN_TIME_GAP=60 #
-        self.YAWN_TIME_ALERT=3 # Cantidad de bostetzos por minuto para que se active la alarma
+        self.YAWN_TIME_ALERT=2 # Cantidad de bostetzos por minuto para que se active la alarma
         self.yawn_time_alert_counter_a= [] #se guardan los bostezos (se guarda en formato time)
+        self.t_end_alarm=0
         self.EVENT_STRING_DROWSINESS= 'Sintomas de suenio'
         self.EVENT_STRING_SLEEP= 'Dormido'
         self.EVENT_STRING_DISTRACTION = 'Distraccion'
@@ -346,7 +347,7 @@ class FaceDetection(object):
         horizontal_lower_bound = self.initial_face_angle_horizontal - horizontal_threshold
         horizontal_upper_bound = self.initial_face_angle_horizontal + horizontal_threshold
         if (self.face_angle_vertical < vertical_lower_bound or self.face_angle_horizontal < horizontal_lower_bound or self.face_angle_horizontal > horizontal_upper_bound):
+            
             if(self.alarm.lost_face()):
                 CsvHandler.csv_input(self.CAR_REGISTRATION,self.EVENT_STRING_DISTRACTION,''+str(self.gps.get_lat()) +', '+ str(self.gps.get_lon())+'',str(self.gps.get_speed()), self.frame)
                 print("Distraccion detectada y registrada")
-        

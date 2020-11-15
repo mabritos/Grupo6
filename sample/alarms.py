@@ -14,22 +14,28 @@ class Alarms():
         self.thread = MyThread()
         self.thread.daemon = True
         self.thread.start()
+        self.t_end_alarm = 0
         
         
         
     def lost_face(self):
         actual_timestamp = time.time()
         distraction_detected = False
-        if (actual_timestamp - self.last_timestamp > 2): #si del ultimo timestamp hasta ahora paso 1 segundo, entonces reinicio el timer
+        if (actual_timestamp - self.last_timestamp > 1): #si del ultimo timestamp hasta ahora paso 3 segundo, entonces reinicio el timer
             self.initial_timestamp = actual_timestamp
             print('Reset timer alarma')
             
-        elif (actual_timestamp - self.initial_timestamp > 3): #si del timestamp inicial hasta ahora pasaron mas de 5 segundos. Osea, paso 5 segundos distraido
+        elif (actual_timestamp - self.initial_timestamp > 1.5): # si del timestamp inicial hasta ahora pasaron mas de 5 segundos. Osea, paso 5 segundos distraido
             self.initial_timestamp = actual_timestamp
-            distraction_detected = True
-            self.text_to_speech('distraction_alert')
+            
+            if (self.t_end_alarm == 0):
+                self.t_end_alarm = time.time() + 5
+                distraction_detected = True
+                self.text_to_speech('distraction_alert')
         
         self.last_timestamp = actual_timestamp
+        if (time.time() > self.t_end_alarm):
+            self.t_end_alarm = 0
         return distraction_detected
 
 
