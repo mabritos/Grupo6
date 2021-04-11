@@ -3,12 +3,15 @@ from api import Api
 from face_detection import FaceDetection
 from gps_data import GpsData
 import os
+from debug import Debug
 
+debug = True
 
 gps = GpsData()
 face_detection = FaceDetection()
 face_detection.set_gps(gps)
 api = Api()
+debug_class = Debug()
 
 
 webcam = cv2.VideoCapture(0)
@@ -42,6 +45,9 @@ while True:
             face_detection.check_drowsiness()
             face_detection.head_pose_estimation()
             face_detection.check_distraction()
+
+        if (debug):
+            debug_class.fps(frame)
 
         cv2.imshow("Frame", frame)
 
